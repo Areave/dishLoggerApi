@@ -1,0 +1,11 @@
+{
+  "compilerOptions": {
+    "target": "ES5",
+    "esModuleInterop": true,
+    "outDir": "build",
+    "rootDir": "src",
+    "sourceMap": true,
+    "forceConsistentCasingInFileNames": true,
+    "baseUrl": "."
+  }
+}

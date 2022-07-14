@@ -1,0 +1,13 @@
+/.idea/
+/.git/
+/www/
+/public/
+/node_modules/
+/build
+build
+
+client/
+index.pug
+.env
+src/mock/mockUsersDB.json
+src/mock/mockWordsDB.json
