@@ -6,7 +6,7 @@
     "rootDir": "./src",
     "sourceMap": true,
     "forceConsistentCasingInFileNames": true,
-    "baseUrl": ".",
-    "include": ["**/*"]
-  }
+    "baseUrl": "."
+  },
+  "include": ["**/*"]
 }
