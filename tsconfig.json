@@ -4,5 +4,9 @@
     "esModuleInterop": true,
     "outDir": "./build",
     "rootDir": "./src",
-  }
+    "sourceMap": true,
+    "forceConsistentCasingInFileNames": true,
+    "baseUrl": "."
+  },
+  "include": ["**/*"]
 }
