@@ -17,7 +17,7 @@ app.use(cors());
 app.use('/users', usersRouter);
 app.use('/words', wordsRouter);
 app.use('/auth', authRouter);
-app.use('/', (req, res)=>{
+app.get('/', (req, res)=>{
     res.send('hey, its me')
 
 });
