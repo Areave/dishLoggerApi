@@ -18,8 +18,7 @@ app.use('/users', usersRouter);
 app.use('/words', wordsRouter);
 app.use('/auth', authRouter);
 app.get('/', (req, res)=>{
-    res.send('hey, its me')
-
+    res.send('hey, its me');
 });
 
 // const compiledFunction = pug.compileFile('index.pug');
