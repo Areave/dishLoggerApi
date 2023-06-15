@@ -8,6 +8,7 @@
     "serverdev": "nodemon index.js",
     "watch": "tsc -w",
     "build": "tsc",
+    "buildev": "tsc && node .",
     "start": "node .",
     "server:dev": "concurrently \"tsc -w --preserveWatchOutput\" \"nodemon index.js\""
   },

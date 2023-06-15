@@ -5,6 +5,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 var express_1 = __importDefault(require("express"));
 var dotenv_1 = __importDefault(require("dotenv"));
+var pug_1 = __importDefault(require("pug"));
 var cors_1 = __importDefault(require("cors"));
 var dbService_1 = require("./dataBase/dbService");
 var routes_1 = require("./routes");
@@ -17,15 +18,15 @@ app.use((0, cors_1.default)());
 app.use('/users', routes_1.usersRouter);
 app.use('/words', routes_1.wordsRouter);
 app.use('/auth', routes_1.authRouter);
-app.get('/', function (req, res) {
-    res.send('hey, its me');
-});
-// const compiledFunction = pug.compileFile('index.pug');
-// app.get('/', (request, response) => {
-//     response.send(pug.compileFile('index.pug')({
-//         name: 'joe'
-//     }));
+// app.get('/', (req, res)=>{
+//     res.send('hey, its me');
 // });
+var compiledFunction = pug_1.default.compileFile('index.pug');
+app.get('/', function (request, response) {
+    response.send(pug_1.default.compileFile('index.pug')({
+        name: 'joe'
+    }));
+});
 var start = function () {
     try {
         (0, dbService_1.dbConnect)(mongoUri).then(function () {

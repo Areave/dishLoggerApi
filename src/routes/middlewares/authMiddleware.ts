@@ -8,6 +8,8 @@ export const authMiddleware = (request, response, next) => {
         if (request.method === 'OPTIONS') {
             return next();
         }
+
+        console.log('request.headers', request.headers);
         const token = request.headers.authorization.split(' ')[1];
 
         if (!token) {

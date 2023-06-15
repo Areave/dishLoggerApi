@@ -73,6 +73,7 @@ exports.authRouter.post('/gettoken', function (req, res) { return __awaiter(void
     var telegramNickname, jwtKey, token;
     return __generator(this, function (_a) {
         try {
+            console.log('req.body', req.body);
             telegramNickname = req.body.telegramNickname;
             if (!telegramNickname) {
                 throw new Error('no telegram nickname was sended');

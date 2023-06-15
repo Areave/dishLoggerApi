@@ -35,6 +35,7 @@ var authMiddleware = function (request, response, next) {
         if (request.method === 'OPTIONS') {
             return next();
         }
+        console.log('request.headers', request.headers);
         var token = request.headers.authorization.split(' ')[1];
         if (!token) {
             console.log('error token');

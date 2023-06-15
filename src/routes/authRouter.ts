@@ -11,6 +11,7 @@ export const authRouter = Router({strict: true});
 // auth/gettoken
 authRouter.post('/gettoken', async (req: Request, res: Response) => {
     try {
+        console.log('req.body', req.body);
         const {telegramNickname} = req.body;
         if(!telegramNickname) {
             throw new Error('no telegram nickname was sended')
@@ -20,7 +21,7 @@ authRouter.post('/gettoken', async (req: Request, res: Response) => {
         const token = jwt.sign(
             {telegramNickname: telegramNickname},
             jwtKey,
-            {expiresIn: 60*60}
+            {expiresIn: 60*60*60}
         );
         // console.log('return token', token);
         res.status(201).json({token});
