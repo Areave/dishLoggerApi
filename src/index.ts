@@ -17,17 +17,17 @@ app.use(cors());
 // app.use('/users', usersRouter);
 // app.use('/words', wordsRouter);
 app.use('/auth', authRouter);
-// app.get('/', (req, res)=>{
-//     res.send('hey, its me');
-// });
+app.get('/', (req, res)=>{
+    res.send('hey, its me');
+});
 
 const compiledFunction = pug.compileFile('index.pug');
 
-app.get('/', (request, response) => {
-    response.send(pug.compileFile('index.pug')({
-        name: 'joe'
-    }));
-});
+// app.get('/', (request, response) => {
+//     response.send(pug.compileFile('index.pug')({
+//         name: 'joe'
+//     }));
+// });
 
 
 const start = () => {

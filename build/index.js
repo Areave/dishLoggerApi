@@ -18,15 +18,15 @@ app.use((0, cors_1.default)());
 // app.use('/users', usersRouter);
 // app.use('/words', wordsRouter);
 app.use('/auth', routes_1.authRouter);
-// app.get('/', (req, res)=>{
-//     res.send('hey, its me');
-// });
-var compiledFunction = pug_1.default.compileFile('index.pug');
-app.get('/', function (request, response) {
-    response.send(pug_1.default.compileFile('index.pug')({
-        name: 'joe'
-    }));
+app.get('/', function (req, res) {
+    res.send('hey, its me');
 });
+var compiledFunction = pug_1.default.compileFile('index.pug');
+// app.get('/', (request, response) => {
+//     response.send(pug.compileFile('index.pug')({
+//         name: 'joe'
+//     }));
+// });
 var start = function () {
     try {
         (0, dbService_1.dbConnect)(mongoUri).then(function () {
