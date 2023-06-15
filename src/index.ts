@@ -21,7 +21,7 @@ app.get('/', (req, res)=>{
     res.send('hey, its me');
 });
 
-const compiledFunction = pug.compileFile('index.pug');
+// const compiledFunction = pug.compileFile('index.pug');
 
 // app.get('/', (request, response) => {
 //     response.send(pug.compileFile('index.pug')({

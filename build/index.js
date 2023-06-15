@@ -5,7 +5,6 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 var express_1 = __importDefault(require("express"));
 var dotenv_1 = __importDefault(require("dotenv"));
-var pug_1 = __importDefault(require("pug"));
 var cors_1 = __importDefault(require("cors"));
 var dbService_1 = require("./dataBase/dbService");
 var routes_1 = require("./routes");
@@ -21,7 +20,7 @@ app.use('/auth', routes_1.authRouter);
 app.get('/', function (req, res) {
     res.send('hey, its me');
 });
-var compiledFunction = pug_1.default.compileFile('index.pug');
+// const compiledFunction = pug.compileFile('index.pug');
 // app.get('/', (request, response) => {
 //     response.send(pug.compileFile('index.pug')({
 //         name: 'joe'
