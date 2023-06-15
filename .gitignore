@@ -3,8 +3,6 @@
 /www/
 /public/
 /node_modules/
-/build
-build
 
 client/
 index.pug
