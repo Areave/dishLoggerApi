@@ -79,7 +79,7 @@ exports.authRouter.post('/gettoken', function (req, res) { return __awaiter(void
                 throw new Error('no telegram nickname was sended');
             }
             jwtKey = process.env.jwtKey;
-            token = jwt.sign({ telegramNickname: telegramNickname }, jwtKey, { expiresIn: 60 * 60 });
+            token = jwt.sign({ telegramNickname: telegramNickname }, jwtKey, { expiresIn: 60 * 60 * 60 });
             // console.log('return token', token);
             res.status(201).json({ token: token });
         }

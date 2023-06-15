@@ -15,8 +15,8 @@ var port = process.env.PORT;
 var app = (0, express_1.default)();
 app.use(express_1.default.json());
 app.use((0, cors_1.default)());
-app.use('/users', routes_1.usersRouter);
-app.use('/words', routes_1.wordsRouter);
+// app.use('/users', usersRouter);
+// app.use('/words', wordsRouter);
 app.use('/auth', routes_1.authRouter);
 // app.get('/', (req, res)=>{
 //     res.send('hey, its me');

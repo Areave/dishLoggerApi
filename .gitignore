@@ -5,7 +5,6 @@
 /node_modules/
 
 client/
-index.pug
 .env
 src/mock/mockUsersDB.json
 src/mock/mockWordsDB.json
