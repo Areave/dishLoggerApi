@@ -1,26 +1,26 @@
 import {Schema, model, Types} from 'mongoose';
 
 const userSchema = new Schema({
-    telegramNickname: {
+    name: {
+        type: String
+    },
+    login: {
         type: String,
         required: true,
-        unique: true
-    },
-    email: {
-        type: String,
-        unique: true
     },
     password: {
         type: String,
+        required: true,
     },
-    words: [{
-        type: Types.ObjectId,
-        ref: 'Word'
-    }],
-    stats: {
-        type: Types.ObjectId,
-        ref: "Stats"
-    }
+    intakeData: {
+        type: Object
+    },
+    products: {
+        type: Array,
+    },
+    meals: {
+        type: Array,
+    },
 });
 
 export = model('User', userSchema);

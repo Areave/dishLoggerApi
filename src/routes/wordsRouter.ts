@@ -7,29 +7,29 @@ export const wordsRouter = Router({strict: true});
 
 // words/create
 wordsRouter.post('/create', authMiddleware, async (req: Request<ParamsDictionary>, res: Response): Promise<Response> => {
-    try {
-        const {word, translation, language, telegramNickname} = req.body;
-        const existingInstance = await Word.findOne({word});
-        if (existingInstance) {
-            return res.status(400).json({message: 'word is already exist in database'});
-        }
-        const isUserExist = await User.findOne({telegramNickname});
-        let user;
-        if (!isUserExist) {
-            user = new User({
-                telegramNickname
-            });
-            await user.save();
-        } else {
-            user = isUserExist;
-        }
-        const newWord = new Word({word, translation, language, owner: user});
-        await newWord.save();
-        res.status(201).json({message: 'word added'});
-    } catch (error) {
-        console.log('from server', error.message);
-        res.status(500).json({message: error.message});
-    }
+    // try {
+    //     const {word, translation, language, telegramNickname} = req.body;
+    //     const existingInstance = await Word.findOne({word});
+    //     if (existingInstance) {
+    //         return res.status(400).json({message: 'word is already exist in database'});
+    //     }
+    //     const isUserExist = await User.findOne({telegramNickname});
+    //     let user;
+    //     if (!isUserExist) {
+    //         user = new User({
+    //             telegramNickname
+    //         });
+    //         await user.save();
+    //     } else {
+    //         user = isUserExist;
+    //     }
+    //     const newWord = new Word({word, translation, language, owner: user});
+    //     await newWord.save();
+    //     res.status(201).json({message: 'word added'});
+    // } catch (error) {
+    //     console.log('from server', error.message);
+        return res.status(500).json({message: 'error.message'});
+    // }
 });
 
 // words/get

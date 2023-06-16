@@ -1,27 +1,4 @@
 "use strict";
-var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    var desc = Object.getOwnPropertyDescriptor(m, k);
-    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
-      desc = { enumerable: true, get: function() { return m[k]; } };
-    }
-    Object.defineProperty(o, k2, desc);
-}) : (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    o[k2] = m[k];
-}));
-var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
-    Object.defineProperty(o, "default", { enumerable: true, value: v });
-}) : function(o, v) {
-    o["default"] = v;
-});
-var __importStar = (this && this.__importStar) || function (mod) {
-    if (mod && mod.__esModule) return mod;
-    var result = {};
-    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
-    __setModuleDefault(result, mod);
-    return result;
-};
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -64,30 +41,120 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.authRouter = void 0;
 var express_1 = require("express");
-var jwt = __importStar(require("jsonwebtoken"));
+var models_1 = require("./../dataBase/models");
 var dotenv_1 = __importDefault(require("dotenv"));
+var bcryptjs_1 = __importDefault(require("bcryptjs"));
+var express_validator_1 = require("express-validator");
 dotenv_1.default.config();
 exports.authRouter = (0, express_1.Router)({ strict: true });
-// auth/gettoken
-exports.authRouter.post('/gettoken', function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
-    var telegramNickname, jwtKey, token;
-    return __generator(this, function (_a) {
-        try {
-            console.log('req.body', req.body);
-            telegramNickname = req.body.telegramNickname;
-            if (!telegramNickname) {
-                throw new Error('no telegram nickname was sended');
-            }
-            jwtKey = process.env.jwtKey;
-            token = jwt.sign({ telegramNickname: telegramNickname }, jwtKey, { expiresIn: 60 * 60 * 60 });
-            // console.log('return token', token);
-            res.status(201).json({ token: token });
+// api/auth/registration
+exports.authRouter.post('/registration', [
+    (0, express_validator_1.check)('login', 'Login can\'t be empty').notEmpty(),
+    (0, express_validator_1.check)('password', 'Password has to be at least 2 chars').isLength({ min: 2 }),
+], function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
+    var registrationErrors, _a, login, password, name_1, candidate, hashedPassword, user, error_1;
+    return __generator(this, function (_b) {
+        switch (_b.label) {
+            case 0:
+                registrationErrors = (0, express_validator_1.validationResult)(req);
+                if (!registrationErrors.isEmpty()) {
+                    return [2 /*return*/, res.status(400).json({
+                            errors: registrationErrors.array(),
+                            message: 'Registration error'
+                        })];
+                }
+                _b.label = 1;
+            case 1:
+                _b.trys.push([1, 5, , 6]);
+                _a = req.body, login = _a.login, password = _a.password, name_1 = _a.name;
+                return [4 /*yield*/, models_1.User.findOne({ login: login })];
+            case 2:
+                candidate = _b.sent();
+                if (candidate) {
+                    return [2 /*return*/, res.status(400).json({
+                            message: 'User already exists'
+                        })];
+                }
+                return [4 /*yield*/, bcryptjs_1.default.hash(password, 12)];
+            case 3:
+                hashedPassword = _b.sent();
+                user = new models_1.User({ login: login, name: name_1, password: hashedPassword });
+                return [4 /*yield*/, user.save()];
+            case 4:
+                _b.sent();
+                return [2 /*return*/, res.status(201).json({ message: 'User created successfully' })];
+            case 5:
+                error_1 = _b.sent();
+                console.log('from authRouter', error_1.message);
+                res.status(500).json({ message: error_1.message });
+                return [3 /*break*/, 6];
+            case 6: return [2 /*return*/];
         }
-        catch (error) {
-            console.log('from router', error.message);
-            res.status(500).json({ message: error.message });
-        }
-        return [2 /*return*/];
     });
 }); });
+// api/auth/login
+exports.authRouter.post('/login', [
+    (0, express_validator_1.check)('login', 'Login can\'t be empty').notEmpty(),
+    (0, express_validator_1.check)('password', 'Password can\'t be empty').notEmpty(),
+], function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
+    var loginErrors, _a, login, password, user, dbHashPassword, isPasswordMatch, error_2;
+    return __generator(this, function (_b) {
+        switch (_b.label) {
+            case 0:
+                loginErrors = (0, express_validator_1.validationResult)(req);
+                if (!loginErrors.isEmpty()) {
+                    return [2 /*return*/, res.status(400).json({
+                            errors: loginErrors.array(),
+                            message: 'Login error'
+                        })];
+                }
+                _b.label = 1;
+            case 1:
+                _b.trys.push([1, 4, , 5]);
+                _a = req.body, login = _a.login, password = _a.password;
+                return [4 /*yield*/, models_1.User.findOne({ login: login })];
+            case 2:
+                user = _b.sent();
+                if (!user) {
+                    return [2 /*return*/, res.status(400).json({ message: 'No such a user as ' + login })];
+                }
+                dbHashPassword = user.password;
+                return [4 /*yield*/, bcryptjs_1.default.compare(password, dbHashPassword)];
+            case 3:
+                isPasswordMatch = _b.sent();
+                if (!isPasswordMatch) {
+                    return [2 /*return*/, res.status(400).json({ message: 'Incorrect password' })];
+                }
+                return [2 /*return*/, res.status(200).json({ userId: user.id })];
+            case 4:
+                error_2 = _b.sent();
+                console.log('from authRouter', error_2.message);
+                res.status(500).json({ message: error_2.message });
+                return [3 /*break*/, 5];
+            case 5: return [2 /*return*/];
+        }
+    });
+}); });
+// // auth/gettoken
+// authRouter.post('/gettoken', async (req: Request, res: Response) => {
+//     try {
+//         console.log('req.body', req.body);
+//         const {telegramNickname} = req.body;
+//         if (!telegramNickname) {
+//             throw new Error('no telegram nickname was sended')
+//         }
+//         // console.log('telegramNickname from authRouter', telegramNickname, req.body);
+//         const jwtKey = process.env.jwtKey;
+//         const token = jwt.sign(
+//             {telegramNickname: telegramNickname},
+//             jwtKey,
+//             {expiresIn: 60 * 60 * 60}
+//         );
+//         // console.log('return token', token);
+//         res.status(201).json({token});
+//     } catch (error) {
+//         console.log('from router', error.message);
+//         res.status(500).json({message: error.message})
+//     }
+// });
 //# sourceMappingURL=authRouter.js.map

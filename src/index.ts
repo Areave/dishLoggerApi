@@ -2,8 +2,9 @@ import express from 'express'
 import dotenv from 'dotenv';
 import pug from 'pug';
 import cors from 'cors';
+// import './index.pug';
 import {dbConnect} from './dataBase/dbService';
-import {usersRouter, wordsRouter, authRouter} from "./routes";
+import {usersRouter, wordsRouter, authRouter, productRouter} from "./routes";
 
 
 dotenv.config();
@@ -16,7 +17,11 @@ app.use(express.json());
 app.use(cors());
 // app.use('/users', usersRouter);
 // app.use('/words', wordsRouter);
-app.use('/auth', authRouter);
+app.use('/api/auth', authRouter);
+app.use('/api/products', productRouter);
+// app.use('/api/auth/registration', (req, res) => {
+//     res.send('auth endpoint');
+// });
 app.get('/', (req, res)=>{
     res.send('hey, its me');
 });
@@ -24,7 +29,7 @@ app.get('/', (req, res)=>{
 // const compiledFunction = pug.compileFile('index.pug');
 
 // app.get('/', (request, response) => {
-//     response.send(pug.compileFile('index.pug')({
+//     response.send(pug.compileFile('./index.pug')({
 //         name: 'joe'
 //     }));
 // });

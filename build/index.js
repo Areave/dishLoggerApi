@@ -6,6 +6,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 var express_1 = __importDefault(require("express"));
 var dotenv_1 = __importDefault(require("dotenv"));
 var cors_1 = __importDefault(require("cors"));
+// import './index.pug';
 var dbService_1 = require("./dataBase/dbService");
 var routes_1 = require("./routes");
 dotenv_1.default.config();
@@ -16,13 +17,17 @@ app.use(express_1.default.json());
 app.use((0, cors_1.default)());
 // app.use('/users', usersRouter);
 // app.use('/words', wordsRouter);
-app.use('/auth', routes_1.authRouter);
+app.use('/api/auth', routes_1.authRouter);
+app.use('/api/products', routes_1.productRouter);
+// app.use('/api/auth/registration', (req, res) => {
+//     res.send('auth endpoint');
+// });
 app.get('/', function (req, res) {
     res.send('hey, its me');
 });
 // const compiledFunction = pug.compileFile('index.pug');
 // app.get('/', (request, response) => {
-//     response.send(pug.compileFile('index.pug')({
+//     response.send(pug.compileFile('./index.pug')({
 //         name: 'joe'
 //     }));
 // });

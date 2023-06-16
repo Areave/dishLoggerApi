@@ -43,52 +43,34 @@ var authMiddleware_1 = require("./middlewares/authMiddleware");
 exports.wordsRouter = (0, express_1.Router)({ strict: true });
 // words/create
 exports.wordsRouter.post('/create', authMiddleware_1.authMiddleware, function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
-    var _a, word, translation, language, telegramNickname, existingInstance, isUserExist, user, newWord, error_1;
-    return __generator(this, function (_b) {
-        switch (_b.label) {
-            case 0:
-                _b.trys.push([0, 7, , 8]);
-                _a = req.body, word = _a.word, translation = _a.translation, language = _a.language, telegramNickname = _a.telegramNickname;
-                return [4 /*yield*/, models_1.Word.findOne({ word: word })];
-            case 1:
-                existingInstance = _b.sent();
-                if (existingInstance) {
-                    return [2 /*return*/, res.status(400).json({ message: 'word is already exist in database' })];
-                }
-                return [4 /*yield*/, models_1.User.findOne({ telegramNickname: telegramNickname })];
-            case 2:
-                isUserExist = _b.sent();
-                user = void 0;
-                if (!!isUserExist) return [3 /*break*/, 4];
-                user = new models_1.User({
-                    telegramNickname: telegramNickname
-                });
-                return [4 /*yield*/, user.save()];
-            case 3:
-                _b.sent();
-                return [3 /*break*/, 5];
-            case 4:
-                user = isUserExist;
-                _b.label = 5;
-            case 5:
-                newWord = new models_1.Word({ word: word, translation: translation, language: language, owner: user });
-                return [4 /*yield*/, newWord.save()];
-            case 6:
-                _b.sent();
-                res.status(201).json({ message: 'word added' });
-                return [3 /*break*/, 8];
-            case 7:
-                error_1 = _b.sent();
-                console.log('from server', error_1.message);
-                res.status(500).json({ message: error_1.message });
-                return [3 /*break*/, 8];
-            case 8: return [2 /*return*/];
-        }
+    return __generator(this, function (_a) {
+        // try {
+        //     const {word, translation, language, telegramNickname} = req.body;
+        //     const existingInstance = await Word.findOne({word});
+        //     if (existingInstance) {
+        //         return res.status(400).json({message: 'word is already exist in database'});
+        //     }
+        //     const isUserExist = await User.findOne({telegramNickname});
+        //     let user;
+        //     if (!isUserExist) {
+        //         user = new User({
+        //             telegramNickname
+        //         });
+        //         await user.save();
+        //     } else {
+        //         user = isUserExist;
+        //     }
+        //     const newWord = new Word({word, translation, language, owner: user});
+        //     await newWord.save();
+        //     res.status(201).json({message: 'word added'});
+        // } catch (error) {
+        //     console.log('from server', error.message);
+        return [2 /*return*/, res.status(500).json({ message: 'error.message' })];
     });
 }); });
 // words/get
 exports.wordsRouter.get('/get', authMiddleware_1.authMiddleware, function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
-    var telegramNickname, user, wordsArray, error_2;
+    var telegramNickname, user, wordsArray, error_1;
     return __generator(this, function (_a) {
         switch (_a.label) {
             case 0:
@@ -106,9 +88,9 @@ exports.wordsRouter.get('/get', authMiddleware_1.authMiddleware, function (req, 
                 wordsArray = _a.sent();
                 return [2 /*return*/, res.status(201).json({ message: 'words was found', wordsArray: wordsArray })];
             case 3:
-                error_2 = _a.sent();
-                console.log('from server words/get', error_2.message);
-                res.status(500).json({ message: error_2.message });
+                error_1 = _a.sent();
+                console.log('from server words/get', error_1.message);
+                res.status(500).json({ message: error_1.message });
                 return [3 /*break*/, 4];
             case 4: return [2 /*return*/];
         }
@@ -116,7 +98,7 @@ exports.wordsRouter.get('/get', authMiddleware_1.authMiddleware, function (req, 
 }); });
 // words/get/:id
 exports.wordsRouter.get('/get/:id', authMiddleware_1.authMiddleware, function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
-    var word, telegramNickname, user, existingInstance, error_3;
+    var word, telegramNickname, user, existingInstance, error_2;
     return __generator(this, function (_a) {
         switch (_a.label) {
             case 0:
@@ -143,9 +125,9 @@ exports.wordsRouter.get('/get/:id', authMiddleware_1.authMiddleware, function (r
                 }
                 return [2 /*return*/, res.status(400).json({ message: 'no such word in database' })];
             case 5:
-                error_3 = _a.sent();
-                console.log('from server', error_3.message);
-                res.status(500).json({ message: error_3.message });
+                error_2 = _a.sent();
+                console.log('from server', error_2.message);
+                res.status(500).json({ message: error_2.message });
                 return [3 /*break*/, 6];
             case 6: return [2 /*return*/];
         }
@@ -153,7 +135,7 @@ exports.wordsRouter.get('/get/:id', authMiddleware_1.authMiddleware, function (r
 }); });
 // words/update
 exports.wordsRouter.patch('/update', authMiddleware_1.authMiddleware, function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
-    var _a, word, translation, language, telegramNickname, existingInstance, error_4;
+    var _a, word, translation, language, telegramNickname, existingInstance, error_3;
     return __generator(this, function (_b) {
         switch (_b.label) {
             case 0:
@@ -171,9 +153,9 @@ exports.wordsRouter.patch('/update', authMiddleware_1.authMiddleware, function (
                 res.status(201).json({ message: 'word updated in database' });
                 return [3 /*break*/, 4];
             case 3:
-                error_4 = _b.sent();
-                console.log('from server', error_4.message);
-                res.status(500).json({ message: error_4.message });
+                error_3 = _b.sent();
+                console.log('from server', error_3.message);
+                res.status(500).json({ message: error_3.message });
                 return [3 /*break*/, 4];
             case 4: return [2 /*return*/];
         }
@@ -181,7 +163,7 @@ exports.wordsRouter.patch('/update', authMiddleware_1.authMiddleware, function (
 }); });
 // words/remove
 exports.wordsRouter.delete('/remove', authMiddleware_1.authMiddleware, function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
-    var _a, word, telegramNickname, user, existingInstance, error_5;
+    var _a, word, telegramNickname, user, existingInstance, error_4;
     return __generator(this, function (_b) {
         switch (_b.label) {
             case 0:
@@ -205,9 +187,9 @@ exports.wordsRouter.delete('/remove', authMiddleware_1.authMiddleware, function 
                 res.status(201).json({ message: 'word removed from database' });
                 return [3 /*break*/, 5];
             case 4:
-                error_5 = _b.sent();
-                console.log('from server', error_5.message);
-                res.status(500).json({ message: error_5.message });
+                error_4 = _b.sent();
+                console.log('from server', error_4.message);
+                res.status(500).json({ message: error_4.message });
                 return [3 /*break*/, 5];
             case 5: return [2 /*return*/];
         }
