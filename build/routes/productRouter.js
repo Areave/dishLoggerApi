@@ -48,25 +48,15 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.productRouter = void 0;
 var express_1 = require("express");
 var models_1 = require("./../dataBase/models");
-var userMiddleware_1 = require("./middlewares/userMiddleware");
+var authMiddleware_1 = require("./middlewares/authMiddleware");
 exports.productRouter = (0, express_1.Router)({ strict: true });
-var updateUserProducts = function (userId, products) { return __awaiter(void 0, void 0, void 0, function () {
-    return __generator(this, function (_a) {
-        switch (_a.label) {
-            case 0: return [4 /*yield*/, models_1.User.updateOne({ _id: userId }, { products: products })];
-            case 1:
-                _a.sent();
-                return [2 /*return*/];
-        }
-    });
-}); };
-var tryCatch = function (res, userId, products) { return __awaiter(void 0, void 0, void 0, function () {
+var updateUserProducts = function (res, userId, products) { return __awaiter(void 0, void 0, void 0, function () {
     var error_1;
     return __generator(this, function (_a) {
         switch (_a.label) {
             case 0:
                 _a.trys.push([0, 2, , 3]);
-                return [4 /*yield*/, updateUserProducts(userId, products)];
+                return [4 /*yield*/, models_1.User.updateOne({ _id: userId }, { products: products })];
             case 1:
                 _a.sent();
                 return [2 /*return*/, res.status(201).json(products)];
@@ -79,15 +69,15 @@ var tryCatch = function (res, userId, products) { return __awaiter(void 0, void 
     });
 }); };
 // api/products/get_all
-exports.productRouter.post('/get_all', userMiddleware_1.userMiddleware, function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
+exports.productRouter.post('/get_all', authMiddleware_1.protect, function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
     var user;
     return __generator(this, function (_a) {
         user = req.body.user;
         return [2 /*return*/, res.status(200).json(user.products)];
     });
 }); });
-// api/products/:id
-exports.productRouter.post('/product/:id', userMiddleware_1.userMiddleware, function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
+// api/products/product/:id
+exports.productRouter.post('/product/:id', authMiddleware_1.protect, function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
     var user, product;
     return __generator(this, function (_a) {
         console.log('req.params.id', req.params.id);
@@ -97,7 +87,7 @@ exports.productRouter.post('/product/:id', userMiddleware_1.userMiddleware, func
     });
 }); });
 // api/products/add
-exports.productRouter.post('/add', userMiddleware_1.userMiddleware, function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
+exports.productRouter.post('/add', authMiddleware_1.protect, function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
     var _a, user, product, products;
     return __generator(this, function (_b) {
         switch (_b.label) {
@@ -110,26 +100,26 @@ exports.productRouter.post('/add', userMiddleware_1.userMiddleware, function (re
                 }
                 products = __spreadArray(__spreadArray([], user.products, true), [product], false);
                 console.log(products);
-                return [4 /*yield*/, tryCatch(res, user._id, products)];
+                return [4 /*yield*/, updateUserProducts(res, user._id, products)];
             case 1: return [2 /*return*/, _b.sent()];
         }
     });
 }); });
 // api/products/update
-exports.productRouter.post('/update', userMiddleware_1.userMiddleware, function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
+exports.productRouter.put('/update', authMiddleware_1.protect, function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
     var _a, user, product, products;
     return __generator(this, function (_b) {
         switch (_b.label) {
             case 0:
                 _a = req.body, user = _a.user, product = _a.product;
                 products = user.products.map(function (userProduct) { return userProduct.id == product.id ? product : userProduct; });
-                return [4 /*yield*/, tryCatch(res, user._id, products)];
+                return [4 /*yield*/, updateUserProducts(res, user._id, products)];
             case 1: return [2 /*return*/, _b.sent()];
         }
     });
 }); });
 // api/products/remove
-exports.productRouter.post('/remove', userMiddleware_1.userMiddleware, function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
+exports.productRouter.post('/remove', authMiddleware_1.protect, function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
     var _a, user, productId, products;
     return __generator(this, function (_b) {
         switch (_b.label) {
@@ -138,20 +128,20 @@ exports.productRouter.post('/remove', userMiddleware_1.userMiddleware, function 
                 products = user.products.filter(function (product) {
                     return product.id != productId;
                 });
-                return [4 /*yield*/, tryCatch(res, user._id, products)];
+                return [4 /*yield*/, updateUserProducts(res, user._id, products)];
             case 1: return [2 /*return*/, _b.sent()];
         }
     });
 }); });
 // api/products/remove
-exports.productRouter.post('/remove_all', userMiddleware_1.userMiddleware, function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
+exports.productRouter.post('/remove_all', authMiddleware_1.protect, function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
     var user, products;
     return __generator(this, function (_a) {
         switch (_a.label) {
             case 0:
                 user = req.body.user;
                 products = [];
-                return [4 /*yield*/, tryCatch(res, user._id, products)];
+                return [4 /*yield*/, updateUserProducts(res, user._id, products)];
             case 1: return [2 /*return*/, _a.sent()];
         }
     });

@@ -1,9 +1,11 @@
 import {Router, Request, Response} from 'express';
 import {User} from './../dataBase/models'
-import * as jwt from 'jsonwebtoken'
 import dotenv from 'dotenv'
 import bcrypt from 'bcryptjs';
 import {check, validationResult} from 'express-validator';
+import generateToken from "../utils/generateToken";
+import {userMiddleware} from "./middlewares/userMiddleware";
+
 
 dotenv.config();
 
@@ -24,18 +26,20 @@ authRouter.post('/registration', [
     try {
         const {login, password, name} = req.body;
         const candidate = await User.findOne({login});
-        if(candidate) {
+        if (candidate) {
             return res.status(400).json({
                 message: 'User already exists'
             });
         }
-        const hashedPassword = await bcrypt.hash(password, 12);
-        const user = new User({login, name, password: hashedPassword});
-        await user.save();
-        return res.status(201).json({message: 'User created successfully'});
+        // const hashedPassword = await bcrypt.hash(password, 12);
+        const newUser = await User.create({login, name, password});
+        // const user = new User({login, name, password: hashedPassword});
+        // await user.save();
+        generateToken(res, newUser._id);
+        res.status(201).json({message: 'User created successfully', user: newUser});
     } catch (error) {
         console.log('from authRouter', error.message);
-        res.status(500).json({message: error.message})
+        res.status(500).json({message: 'Database problems', stack: error.message})
     }
 });
 
@@ -54,41 +58,38 @@ authRouter.post('/login', [
     try {
         const {login, password} = req.body;
         const user = await User.findOne({login});
-        if (!user) {
-            return res.status(400).json({message: 'No such a user as ' + login});
+
+        // @ts-ignore
+        if (!user || !(await user.matchPassword(password))) {
+            console.log(user);
+            return res.status(400).json({message: 'No such a user'});
         }
-        const dbHashPassword = user.password;
-        const isPasswordMatch = await bcrypt.compare(password, dbHashPassword);
-        if (!isPasswordMatch) {
-            return res.status(400).json({message: 'Incorrect password'});
-        }
-        return res.status(200).json({userId: user.id});
+
+        generateToken(res, user._id);
+        res.status(200).json({message: 'You successfully logged in', user});
     } catch (error) {
         console.log('from authRouter', error.message);
-        res.status(500).json({message: error.message});
+        res.status(500).json({
+            message: 'Database error',
+            stack: error.message
+        });
     }
 });
 
+// api/auth/logout
+authRouter.post('/logout', (req: Request, res: Response) => {
 
-// // auth/gettoken
-// authRouter.post('/gettoken', async (req: Request, res: Response) => {
-//     try {
-//         console.log('req.body', req.body);
-//         const {telegramNickname} = req.body;
-//         if (!telegramNickname) {
-//             throw new Error('no telegram nickname was sended')
-//         }
-//         // console.log('telegramNickname from authRouter', telegramNickname, req.body);
-//         const jwtKey = process.env.jwtKey;
-//         const token = jwt.sign(
-//             {telegramNickname: telegramNickname},
-//             jwtKey,
-//             {expiresIn: 60 * 60 * 60}
-//         );
-//         // console.log('return token', token);
-//         res.status(201).json({token});
-//     } catch (error) {
-//         console.log('from router', error.message);
-//         res.status(500).json({message: error.message})
-//     }
-// });
+    // console.log(res.client.cookies.jwt);
+    //TODO: смотреть не вышел ли уже, как получить cookie?
+    //     if (res.header('Set-Cookie')) {
+            res.cookie('jwt', '', {
+                httpOnly: true,
+                // @ts-ignore
+                expired: new Date(0),
+            });
+            res.status(200).json({message: 'Successfully logged out'});
+        // } else {
+        //     res.status(200).json({message: 'You are already logged out'});
+        // }
+
+});

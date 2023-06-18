@@ -43,8 +43,8 @@ exports.authRouter = void 0;
 var express_1 = require("express");
 var models_1 = require("./../dataBase/models");
 var dotenv_1 = __importDefault(require("dotenv"));
-var bcryptjs_1 = __importDefault(require("bcryptjs"));
 var express_validator_1 = require("express-validator");
+var generateToken_1 = __importDefault(require("../utils/generateToken"));
 dotenv_1.default.config();
 exports.authRouter = (0, express_1.Router)({ strict: true });
 // api/auth/registration
@@ -52,7 +52,7 @@ exports.authRouter.post('/registration', [
     (0, express_validator_1.check)('login', 'Login can\'t be empty').notEmpty(),
     (0, express_validator_1.check)('password', 'Password has to be at least 2 chars').isLength({ min: 2 }),
 ], function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
-    var registrationErrors, _a, login, password, name_1, candidate, hashedPassword, user, error_1;
+    var registrationErrors, _a, login, password, name_1, candidate, newUser, error_1;
     return __generator(this, function (_b) {
         switch (_b.label) {
             case 0:
@@ -65,7 +65,7 @@ exports.authRouter.post('/registration', [
                 }
                 _b.label = 1;
             case 1:
-                _b.trys.push([1, 5, , 6]);
+                _b.trys.push([1, 4, , 5]);
                 _a = req.body, login = _a.login, password = _a.password, name_1 = _a.name;
                 return [4 /*yield*/, models_1.User.findOne({ login: login })];
             case 2:
@@ -75,20 +75,20 @@ exports.authRouter.post('/registration', [
                             message: 'User already exists'
                         })];
                 }
-                return [4 /*yield*/, bcryptjs_1.default.hash(password, 12)];
+                return [4 /*yield*/, models_1.User.create({ login: login, name: name_1, password: password })];
             case 3:
-                hashedPassword = _b.sent();
-                user = new models_1.User({ login: login, name: name_1, password: hashedPassword });
-                return [4 /*yield*/, user.save()];
+                newUser = _b.sent();
+                // const user = new User({login, name, password: hashedPassword});
+                // await user.save();
+                (0, generateToken_1.default)(res, newUser._id);
+                res.status(201).json({ message: 'User created successfully', user: newUser });
+                return [3 /*break*/, 5];
             case 4:
-                _b.sent();
-                return [2 /*return*/, res.status(201).json({ message: 'User created successfully' })];
-            case 5:
                 error_1 = _b.sent();
                 console.log('from authRouter', error_1.message);
-                res.status(500).json({ message: error_1.message });
-                return [3 /*break*/, 6];
-            case 6: return [2 /*return*/];
+                res.status(500).json({ message: 'Database problems', stack: error_1.message });
+                return [3 /*break*/, 5];
+            case 5: return [2 /*return*/];
         }
     });
 }); });
@@ -97,9 +97,9 @@ exports.authRouter.post('/login', [
     (0, express_validator_1.check)('login', 'Login can\'t be empty').notEmpty(),
     (0, express_validator_1.check)('password', 'Password can\'t be empty').notEmpty(),
 ], function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
-    var loginErrors, _a, login, password, user, dbHashPassword, isPasswordMatch, error_2;
-    return __generator(this, function (_b) {
-        switch (_b.label) {
+    var loginErrors, _a, login, password, user, _b, _c, _d, error_2;
+    return __generator(this, function (_e) {
+        switch (_e.label) {
             case 0:
                 loginErrors = (0, express_validator_1.validationResult)(req);
                 if (!loginErrors.isEmpty()) {
@@ -108,53 +108,58 @@ exports.authRouter.post('/login', [
                             message: 'Login error'
                         })];
                 }
-                _b.label = 1;
+                _e.label = 1;
             case 1:
-                _b.trys.push([1, 4, , 5]);
+                _e.trys.push([1, 7, , 8]);
                 _a = req.body, login = _a.login, password = _a.password;
                 return [4 /*yield*/, models_1.User.findOne({ login: login })];
             case 2:
-                user = _b.sent();
-                if (!user) {
-                    return [2 /*return*/, res.status(400).json({ message: 'No such a user as ' + login })];
-                }
-                dbHashPassword = user.password;
-                return [4 /*yield*/, bcryptjs_1.default.compare(password, dbHashPassword)];
+                user = _e.sent();
+                _b = !user;
+                if (_b) return [3 /*break*/, 4];
+                return [4 /*yield*/, user.matchPassword(password)];
             case 3:
-                isPasswordMatch = _b.sent();
-                if (!isPasswordMatch) {
-                    return [2 /*return*/, res.status(400).json({ message: 'Incorrect password' })];
-                }
-                return [2 /*return*/, res.status(200).json({ userId: user.id })];
+                _b = !(_e.sent());
+                _e.label = 4;
             case 4:
-                error_2 = _b.sent();
+                if (!_b) return [3 /*break*/, 6];
+                // @ts-ignore
+                _d = (_c = console).log;
+                return [4 /*yield*/, user.matchPassword(password)];
+            case 5:
+                // @ts-ignore
+                _d.apply(_c, [_e.sent()]);
+                console.log(user);
+                return [2 /*return*/, res.status(400).json({ message: 'No such a user' })];
+            case 6:
+                (0, generateToken_1.default)(res, user._id);
+                res.status(200).json({ message: 'You successfully logged in', user: user });
+                return [3 /*break*/, 8];
+            case 7:
+                error_2 = _e.sent();
                 console.log('from authRouter', error_2.message);
-                res.status(500).json({ message: error_2.message });
-                return [3 /*break*/, 5];
-            case 5: return [2 /*return*/];
+                res.status(500).json({
+                    message: 'Database error',
+                    stack: error_2.message
+                });
+                return [3 /*break*/, 8];
+            case 8: return [2 /*return*/];
         }
     });
 }); });
-// // auth/gettoken
-// authRouter.post('/gettoken', async (req: Request, res: Response) => {
-//     try {
-//         console.log('req.body', req.body);
-//         const {telegramNickname} = req.body;
-//         if (!telegramNickname) {
-//             throw new Error('no telegram nickname was sended')
-//         }
-//         // console.log('telegramNickname from authRouter', telegramNickname, req.body);
-//         const jwtKey = process.env.jwtKey;
-//         const token = jwt.sign(
-//             {telegramNickname: telegramNickname},
-//             jwtKey,
-//             {expiresIn: 60 * 60 * 60}
-//         );
-//         // console.log('return token', token);
-//         res.status(201).json({token});
-//     } catch (error) {
-//         console.log('from router', error.message);
-//         res.status(500).json({message: error.message})
-//     }
-// });
+// api/auth/logout
+exports.authRouter.post('/logout', function (req, res) {
+    // console.log(res.client.cookies.jwt);
+    //TODO: смотреть не вышел ли уже, как получить cookie?
+    //     if (res.header('Set-Cookie')) {
+    res.cookie('jwt', '', {
+        httpOnly: true,
+        // @ts-ignore
+        expired: new Date(0),
+    });
+    res.status(200).json({ message: 'Successfully logged out' });
+    // } else {
+    //     res.status(200).json({message: 'You are already logged out'});
+    // }
+});
 //# sourceMappingURL=authRouter.js.map

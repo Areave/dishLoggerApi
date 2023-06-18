@@ -1,7 +1,34 @@
 import * as jwt from 'jsonwebtoken'
 import dotenv from 'dotenv';
+import asyncHandler from 'express-async-handler';
+import {User} from '../../dataBase/models'
+
 
 dotenv.config();
+
+export const protect = asyncHandler(async (req, res, next) => {
+    console.log(req.cookies);
+    const rawToken = req.cookies.jwt;
+
+    if (rawToken) {
+
+        try {
+            const decoded = jwt.verify(rawToken, process.env.jwtKey);
+            // @ts-ignore
+            req.body.user = await User.findById(decoded.userId).select('-password');
+            next();
+        } catch (error) {
+            res.status(401);
+            throw new Error('Not authorized, invalid token');
+        }
+
+    } else {
+
+        res.status(401).json({message: 'no token'});
+        // res.status(401);
+        // throw new Error('Not authorized, no token');
+    }
+});
 
 export const authMiddleware = (request, response, next) => {
     try {

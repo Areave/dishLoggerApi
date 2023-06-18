@@ -48,17 +48,15 @@ var userMiddleware = function (request, response, next) { return __awaiter(void 
             case 1:
                 user = _a.sent();
                 if (!user) {
-                    throw new Error('User not exist in database');
+                    return [2 /*return*/, response.status(401).json({ message: 'User not exist in database' })];
                 }
-                // console.log('userId', request.body.userId);
-                // console.log('user', user);
                 request.body.user = user;
                 next();
                 return [3 /*break*/, 3];
             case 2:
                 e_1 = _a.sent();
                 console.log('from userMiddleware, error', e_1);
-                return [2 /*return*/, response.status(401).json({ message: e_1.message })];
+                return [2 /*return*/, response.status(401).json({ message: 'Database problems' })];
             case 3: return [2 /*return*/];
         }
     });
