@@ -1,7 +1,5 @@
 import {Router, Request, Response} from 'express';
 import {User} from './../dataBase/models'
-import {userMiddleware} from "./middlewares/userMiddleware";
-import {protect} from "./middlewares/authMiddleware";
 
 export const productRouter = Router({strict: true});
 
