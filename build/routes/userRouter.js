@@ -242,7 +242,7 @@ exports.userRouter.get('/get_all', function (req, res) { return __awaiter(void 0
                 return [4 /*yield*/, models_1.User.find()];
             case 1:
                 users = _a.sent();
-                res.status(200).json({ users: users });
+                res.status(200).json(users);
                 return [3 /*break*/, 3];
             case 2:
                 error_5 = _a.sent();
