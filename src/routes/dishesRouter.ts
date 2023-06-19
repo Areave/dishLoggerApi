@@ -3,10 +3,10 @@ import {User} from './../dataBase/models'
 
 export const dishesRouter = Router({strict: true});
 
-const updateUserDishes = async (res, userId, products) => {
+const updateUserDishes = async (res, userId, dishes) => {
     try {
-        await User.updateOne({_id: userId}, {products});
-        return res.status(201).json(products);
+        await User.updateOne({_id: userId}, {dishes});
+        return res.status(201).json(dishes);
     } catch (error) {
         return res.status(500).json({
             message: "Database problems",
@@ -30,7 +30,7 @@ dishesRouter.get('/dish/:id', async (req: Request, res: Response): Promise<Respo
             message: "No such dish"
         });
     }
-    res.status(201).json({dish});
+    res.status(201).json(dish);
 });
 
 // api/dishes/add

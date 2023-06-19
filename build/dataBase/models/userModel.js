@@ -55,7 +55,13 @@ var userSchema = new mongoose_1.Schema({
     intakeData: {
         type: Object
     },
+    dailyStats: {
+        type: Array
+    },
     products: {
+        type: Array,
+    },
+    dishes: {
         type: Array,
     },
     meals: {

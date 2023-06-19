@@ -45,20 +45,20 @@ var __spreadArray = (this && this.__spreadArray) || function (to, from, pack) {
     return to.concat(ar || Array.prototype.slice.call(from));
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.productRouter = void 0;
+exports.dishesRouter = void 0;
 var express_1 = require("express");
 var models_1 = require("./../dataBase/models");
-exports.productRouter = (0, express_1.Router)({ strict: true });
-var updateUserProducts = function (res, userId, products) { return __awaiter(void 0, void 0, void 0, function () {
+exports.dishesRouter = (0, express_1.Router)({ strict: true });
+var updateUserDishes = function (res, userId, dishes) { return __awaiter(void 0, void 0, void 0, function () {
     var error_1;
     return __generator(this, function (_a) {
         switch (_a.label) {
             case 0:
                 _a.trys.push([0, 2, , 3]);
-                return [4 /*yield*/, models_1.User.updateOne({ _id: userId }, { products: products })];
+                return [4 /*yield*/, models_1.User.updateOne({ _id: userId }, { dishes: dishes })];
             case 1:
                 _a.sent();
-                return [2 /*return*/, res.status(201).json(products)];
+                return [2 /*return*/, res.status(201).json(dishes)];
             case 2:
                 error_1 = _a.sent();
                 return [2 /*return*/, res.status(500).json({
@@ -69,82 +69,82 @@ var updateUserProducts = function (res, userId, products) { return __awaiter(voi
         }
     });
 }); };
-// api/products/get_all
-exports.productRouter.get('/get_all', function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
+// api/dishes/get_all
+exports.dishesRouter.get('/get_all', function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
     var user;
     return __generator(this, function (_a) {
         user = req.body.user;
-        return [2 /*return*/, res.status(200).json(user.products)];
+        return [2 /*return*/, res.status(200).json(user.dishes)];
     });
 }); });
-// api/products/product/:id
-exports.productRouter.get('/product/:id', function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
-    var user, product;
+// api/dishes/product/:id
+exports.dishesRouter.get('/dish/:id', function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
+    var user, dish;
     return __generator(this, function (_a) {
         user = req.body.user;
-        product = user.products.find(function (product) { return product.id == req.params.id; });
-        if (!product) {
+        dish = user.dishes.find(function (dish) { return dish.id == req.params.id; });
+        if (!dish) {
             return [2 /*return*/, res.status(400).json({
-                    message: "No such product"
+                    message: "No such dish"
                 })];
         }
-        res.status(201).json({ product: product });
+        res.status(201).json({ dish: dish });
         return [2 /*return*/];
     });
 }); });
-// api/products/add
-exports.productRouter.post('/add', function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
-    var _a, user, product, products;
+// api/dishes/add
+exports.dishesRouter.post('/add', function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
+    var _a, user, dish, dishes;
     return __generator(this, function (_b) {
         switch (_b.label) {
             case 0:
-                _a = req.body, user = _a.user, product = _a.product;
-                if (!product) {
-                    res.status(400).json({ message: "Product is null" });
+                _a = req.body, user = _a.user, dish = _a.dish;
+                if (!dish) {
+                    res.status(400).json({ message: "Dish is null" });
                 }
-                products = __spreadArray(__spreadArray([], user.products, true), [product], false);
-                return [4 /*yield*/, updateUserProducts(res, user._id, products)];
+                dishes = __spreadArray(__spreadArray([], user.dishes, true), [dish], false);
+                return [4 /*yield*/, updateUserDishes(res, user._id, dishes)];
             case 1: return [2 /*return*/, _b.sent()];
         }
     });
 }); });
-// api/products/update
-exports.productRouter.put('/update', function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
-    var _a, user, product, products;
+// api/dishes/update
+exports.dishesRouter.put('/update', function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
+    var _a, user, dish, dishes;
     return __generator(this, function (_b) {
         switch (_b.label) {
             case 0:
-                _a = req.body, user = _a.user, product = _a.product;
-                products = user.products.map(function (userProduct) { return userProduct.id == product.id ? product : userProduct; });
-                return [4 /*yield*/, updateUserProducts(res, user._id, products)];
+                _a = req.body, user = _a.user, dish = _a.dish;
+                dishes = user.dishes.map(function (userDish) { return userDish.id == dish.id ? dish : userDish; });
+                return [4 /*yield*/, updateUserDishes(res, user._id, dishes)];
             case 1: return [2 /*return*/, _b.sent()];
         }
     });
 }); });
-// api/products/remove
-exports.productRouter.delete('/remove', function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
-    var _a, user, productId, products;
+// api/dishes/remove
+exports.dishesRouter.delete('/remove', function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
+    var _a, user, dishId, dishes;
     return __generator(this, function (_b) {
         switch (_b.label) {
             case 0:
-                _a = req.body, user = _a.user, productId = _a.productId;
-                products = user.products.filter(function (product) {
-                    return product.id != productId;
+                _a = req.body, user = _a.user, dishId = _a.dishId;
+                dishes = user.dishes.filter(function (dish) {
+                    return dish.id != dishId;
                 });
-                return [4 /*yield*/, updateUserProducts(res, user._id, products)];
+                return [4 /*yield*/, updateUserDishes(res, user._id, dishes)];
             case 1: return [2 /*return*/, _b.sent()];
         }
     });
 }); });
-// api/products/remove_all
-exports.productRouter.delete('/remove_all', function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
-    var user, products;
+// api/dishes/remove_all
+exports.dishesRouter.delete('/remove_all', function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
+    var user, dishes;
     return __generator(this, function (_a) {
         switch (_a.label) {
             case 0:
                 user = req.body.user;
-                products = [];
-                return [4 /*yield*/, updateUserProducts(res, user._id, products)];
+                dishes = [];
+                return [4 /*yield*/, updateUserDishes(res, user._id, dishes)];
             case 1: return [2 /*return*/, _a.sent()];
         }
     });

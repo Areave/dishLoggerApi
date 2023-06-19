@@ -30,7 +30,7 @@ productRouter.get('/product/:id', async (req: Request, res: Response): Promise<R
             message: "No such product"
         });
     }
-    res.status(201).json({product});
+    res.status(201).json(product);
 });
 
 // api/products/add

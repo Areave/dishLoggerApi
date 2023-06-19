@@ -93,7 +93,7 @@ userRouter.post('/logout', (req: Request, res: Response) => {
 
 // api/auth/get
 userRouter.get('/get', protect, (req: Request, res: Response) => {
-    res.status(200).json({user: req.body.user});
+    res.status(200).json(req.body.user);
 });
 
 // api/auth/update
@@ -114,7 +114,7 @@ userRouter.put('/update', protect, async (req: Request, res: Response) => {
             });
             return res.status(201).json({message: 'User data was updated, login again'});
         }
-        res.status(201).json({user: updatedUser});
+        res.status(201).json(updatedUser);
     } catch (error) {
         return res.status(500).json({
             message: "Database problems",

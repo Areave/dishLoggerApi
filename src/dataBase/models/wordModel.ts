@@ -1,5 +1,4 @@
 import {Schema, model, Types} from 'mongoose';
-import {WordInterface} from "../Interfaces";
 
 const wordSchema = new Schema({
     word: {

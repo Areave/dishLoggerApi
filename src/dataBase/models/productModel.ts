@@ -1,5 +1,4 @@
 import {Schema, model, Types} from 'mongoose';
-import {productInterface} from "../Interfaces";
 import {Double} from "mongodb";
 
 const productSchema = new Schema({
