@@ -1,12 +1,12 @@
 import {userRouter} from "./userRouter";
-import {wordsRouter} from "./wordsRouter";
-import {authRouter} from "./authRouter";
+import {dishesRouter} from "./dishesRouter";
 import {productRouter} from "./productRouter";
+// import {mealsRouter} from "./mealsRouter";
 
 
 export {
     userRouter,
-    wordsRouter,
-    authRouter,
+    dishesRouter,
     productRouter,
+    // mealsRouter,
 }

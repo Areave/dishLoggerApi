@@ -59,7 +59,7 @@ productRouter.delete('/remove', async (req: Request, res: Response): Promise<Res
     return await updateUserProducts(res, user._id, products);
 });
 
-// api/products/remove
+// api/products/remove_all
 productRouter.delete('/remove_all', async (req: Request, res: Response): Promise<Response> => {
     const {user} = req.body;
     const products = [];
