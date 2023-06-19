@@ -20,6 +20,7 @@ export interface User {
 export interface Product {
     name: string,
     id: number,
+    type: string,
     description?: string,
     weightOfPieceGr: number,
     price: {
@@ -37,6 +38,7 @@ export interface Product {
 export interface Dish {
     name: string,
     id: number,
+    type: string,
     description?: string,
     weightOfPieceGr: number,
     products: [
@@ -68,12 +70,13 @@ export interface Dish {
 export interface Meal {
     name: string,
     id: number,
+    type: string,
     description?: string,
     weightOfPieceGr: number,
-    dishes: {
+    dishes: [{
         productOrDish: Dish | Product,
         amountGr: number
-    },
+    }],
     price: number,
     energyValue: {
         calories: number,

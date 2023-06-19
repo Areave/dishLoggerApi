@@ -4,7 +4,7 @@ import pug from 'pug';
 import cors from 'cors';
 // import './index.pug';
 import {dbConnect} from './dataBase/dbService';
-import {userRouter, dishesRouter, productRouter} from "./routes";
+import {userRouter, productRouter, dishesRouter, mealsRouter} from "./routes";
 import cookieParser from "cookie-parser";
 import {protect} from "./routes/middlewares/authMiddleware";
 
@@ -24,6 +24,7 @@ app.use(express.urlencoded({extended: true}));
 app.use('/api/auth', userRouter);
 app.use('/api/products', protect, productRouter);
 app.use('/api/dishes', protect, dishesRouter);
+app.use('/api/meals', protect, mealsRouter);
 // app.use('/api/auth/registration', (req, res) => {
 //     res.send('auth endpoint');
 // });
