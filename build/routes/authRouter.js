@@ -45,14 +45,16 @@ var models_1 = require("./../dataBase/models");
 var dotenv_1 = __importDefault(require("dotenv"));
 var express_validator_1 = require("express-validator");
 var generateToken_1 = __importDefault(require("../utils/generateToken"));
+var authMiddleware_1 = require("./middlewares/authMiddleware");
+var bcryptjs_1 = __importDefault(require("bcryptjs"));
 dotenv_1.default.config();
 exports.authRouter = (0, express_1.Router)({ strict: true });
 // api/auth/registration
 exports.authRouter.post('/registration', [
     (0, express_validator_1.check)('login', 'Login can\'t be empty').notEmpty(),
-    (0, express_validator_1.check)('password', 'Password has to be at least 2 chars').isLength({ min: 2 }),
+    (0, express_validator_1.check)('password', 'Password has to be at least 2 chars long').isLength({ min: 2 }),
 ], function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
-    var registrationErrors, _a, login, password, name_1, candidate, newUser, error_1;
+    var registrationErrors, _a, login, password, name_1, user, newUser, error_1;
     return __generator(this, function (_b) {
         switch (_b.label) {
             case 0:
@@ -69,8 +71,8 @@ exports.authRouter.post('/registration', [
                 _a = req.body, login = _a.login, password = _a.password, name_1 = _a.name;
                 return [4 /*yield*/, models_1.User.findOne({ login: login })];
             case 2:
-                candidate = _b.sent();
-                if (candidate) {
+                user = _b.sent();
+                if (user) {
                     return [2 /*return*/, res.status(400).json({
                             message: 'User already exists'
                         })];
@@ -78,15 +80,13 @@ exports.authRouter.post('/registration', [
                 return [4 /*yield*/, models_1.User.create({ login: login, name: name_1, password: password })];
             case 3:
                 newUser = _b.sent();
-                // const user = new User({login, name, password: hashedPassword});
-                // await user.save();
                 (0, generateToken_1.default)(res, newUser._id);
-                res.status(201).json({ message: 'User created successfully', user: newUser });
+                res.status(201).json({ message: 'User created successfully', user: { login: login, name: name_1 } });
                 return [3 /*break*/, 5];
             case 4:
                 error_1 = _b.sent();
                 console.log('from authRouter', error_1.message);
-                res.status(500).json({ message: 'Database problems', stack: error_1.message });
+                res.status(500).json({ message: 'Database problems', stack: error_1.stackTrace });
                 return [3 /*break*/, 5];
             case 5: return [2 /*return*/];
         }
@@ -101,6 +101,9 @@ exports.authRouter.post('/login', [
     return __generator(this, function (_c) {
         switch (_c.label) {
             case 0:
+                if (req.cookies.jwt) {
+                    return [2 /*return*/, res.status(200).json({ message: 'You are already logged in' })];
+                }
                 loginErrors = (0, express_validator_1.validationResult)(req);
                 if (!loginErrors.isEmpty()) {
                     return [2 /*return*/, res.status(400).json({
@@ -124,10 +127,11 @@ exports.authRouter.post('/login', [
             case 4:
                 // @ts-ignore
                 if (_b) {
-                    console.log(user);
                     return [2 /*return*/, res.status(400).json({ message: 'No such a user' })];
                 }
                 (0, generateToken_1.default)(res, user._id);
+                delete user.password;
+                user.password = '';
                 res.status(200).json({ message: 'You successfully logged in', user: user });
                 return [3 /*break*/, 6];
             case 5:
@@ -135,7 +139,7 @@ exports.authRouter.post('/login', [
                 console.log('from authRouter', error_2.message);
                 res.status(500).json({
                     message: 'Database error',
-                    stack: error_2.message
+                    stack: error_2.stackTrace
                 });
                 return [3 /*break*/, 6];
             case 6: return [2 /*return*/];
@@ -144,17 +148,111 @@ exports.authRouter.post('/login', [
 }); });
 // api/auth/logout
 exports.authRouter.post('/logout', function (req, res) {
-    // console.log(res.client.cookies.jwt);
-    //TODO: смотреть не вышел ли уже, как получить cookie?
-    //     if (res.header('Set-Cookie')) {
-    res.cookie('jwt', '', {
-        httpOnly: true,
-        // @ts-ignore
-        expired: new Date(0),
-    });
-    res.status(200).json({ message: 'Successfully logged out' });
-    // } else {
-    //     res.status(200).json({message: 'You are already logged out'});
-    // }
+    if (req.cookies.jwt) {
+        res.cookie('jwt', '', {
+            httpOnly: true,
+            // @ts-ignore
+            expired: new Date(0),
+        });
+        res.status(200).json({ message: 'Successfully logged out' });
+    }
+    else {
+        res.status(200).json({ message: 'You are already logged out' });
+    }
 });
-//# sourceMappingURL=authRouter.js.map
+// api/auth/get
+exports.authRouter.get('/get', authMiddleware_1.protect, function (req, res) {
+    res.status(200).json({ user: req.body.user });
+});
+// api/auth/update
+exports.authRouter.put('/update', authMiddleware_1.protect, function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
+    var _a, user, newUser, _b, _c, _d, _e, updatedUser, error_3;
+    return __generator(this, function (_f) {
+        switch (_f.label) {
+            case 0:
+                _a = req.body, user = _a.user, newUser = _a.newUser;
+                _f.label = 1;
+            case 1:
+                _f.trys.push([1, 6, , 7]);
+                if (!newUser.password) return [3 /*break*/, 4];
+                _b = newUser;
+                _d = (_c = bcryptjs_1.default).hash;
+                _e = [newUser.password];
+                return [4 /*yield*/, bcryptjs_1.default.genSalt(10)];
+            case 2: return [4 /*yield*/, _d.apply(_c, _e.concat([_f.sent()]))];
+            case 3:
+                _b.password = _f.sent();
+                _f.label = 4;
+            case 4: return [4 /*yield*/, models_1.User.findOneAndUpdate({ _id: user._id }, newUser, {
+                    new: true
+                }).select('-password')];
+            case 5:
+                updatedUser = _f.sent();
+                if (newUser.password || newUser.login) {
+                    res.cookie('jwt', '', {
+                        httpOnly: true,
+                        // @ts-ignore
+                        expired: new Date(0),
+                    });
+                    return [2 /*return*/, res.status(201).json({ message: 'User data was updated, login again' })];
+                }
+                res.status(201).json({ user: updatedUser });
+                return [3 /*break*/, 7];
+            case 6:
+                error_3 = _f.sent();
+                return [2 /*return*/, res.status(500).json({
+                        message: "Database problems",
+                        stack: error_3.stackTrace
+                    })];
+            case 7: return [2 /*return*/];
+        }
+    });
+}); });
+// api/auth/delete_all
+exports.authRouter.delete('/delete_all', function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
+    var error_4;
+    return __generator(this, function (_a) {
+        switch (_a.label) {
+            case 0:
+                _a.trys.push([0, 2, , 3]);
+                return [4 /*yield*/, models_1.User.deleteMany({})];
+            case 1:
+                _a.sent();
+                res.status(200).json({ message: 'Users was deleted' });
+                return [3 /*break*/, 3];
+            case 2:
+                error_4 = _a.sent();
+                console.log('from authRouter', error_4.message);
+                res.status(500).json({
+                    message: 'Database error',
+                    stack: error_4.stackTrace
+                });
+                return [3 /*break*/, 3];
+            case 3: return [2 /*return*/];
+        }
+    });
+}); });
+// api/auth/get_all
+exports.authRouter.get('/get_all', function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
+    var users, error_5;
+    return __generator(this, function (_a) {
+        switch (_a.label) {
+            case 0:
+                _a.trys.push([0, 2, , 3]);
+                return [4 /*yield*/, models_1.User.find()];
+            case 1:
+                users = _a.sent();
+                res.status(200).json({ users: users });
+                return [3 /*break*/, 3];
+            case 2:
+                error_5 = _a.sent();
+                console.log('from authRouter', error_5.message);
+                res.status(500).json({
+                    message: 'Database error',
+                    stack: error_5.stackTrace
+                });
+                return [3 /*break*/, 3];
+            case 3: return [2 /*return*/];
+        }
+    });
+}); });

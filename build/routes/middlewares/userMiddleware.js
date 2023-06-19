@@ -62,4 +62,3 @@ var userMiddleware = function (request, response, next) { return __awaiter(void 
     });
 }); };
 exports.userMiddleware = userMiddleware;
-//# sourceMappingURL=userMiddleware.js.map

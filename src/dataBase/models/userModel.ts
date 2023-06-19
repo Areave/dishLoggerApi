@@ -25,6 +25,7 @@ const userSchema = new Schema({
 }, {timestamps: true});
 
 userSchema.pre('save', async function (next){
+    console.log('pre hook');
     if (!this.isModified('password')) {
         next();
     } else {

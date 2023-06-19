@@ -25,4 +25,3 @@ var wordSchema = new mongoose_1.Schema({
     }
 });
 module.exports = (0, mongoose_1.model)('Word', wordSchema);
-//# sourceMappingURL=wordModel.js.map

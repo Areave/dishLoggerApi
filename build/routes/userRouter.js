@@ -29,4 +29,3 @@ exports.userRouter.patch('/login', function (req, res) {
 exports.userRouter.patch('/login', function (req, res) {
     throw new Error("Method not implemented.");
 });
-//# sourceMappingURL=userRouter.js.map

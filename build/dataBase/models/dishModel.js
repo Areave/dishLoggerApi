@@ -25,4 +25,3 @@ var dishSchema = new mongoose_1.Schema({
     },
 });
 module.exports = (0, mongoose_1.model)('Dish', dishSchema);
-//# sourceMappingURL=dishModel.js.map

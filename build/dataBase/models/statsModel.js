@@ -26,4 +26,3 @@ var statsSchema = new mongoose_1.Schema({
     }
 });
 module.exports = (0, mongoose_1.model)('Stats', statsSchema);
-//# sourceMappingURL=statsModel.js.map

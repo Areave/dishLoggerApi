@@ -195,4 +195,3 @@ exports.wordsRouter.delete('/remove', authMiddleware_1.authMiddleware, function 
         }
     });
 }); });
-//# sourceMappingURL=wordsRouter.js.map

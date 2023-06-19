@@ -14,4 +14,3 @@ var addInstance = function (Schema, params) {
     return instance.save();
 };
 exports.addInstance = addInstance;
-//# sourceMappingURL=dbService.js.map

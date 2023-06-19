@@ -5,7 +5,6 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 var jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 var generateToken = function (res, userId) {
-    console.log(userId);
     var token = jsonwebtoken_1.default.sign({ userId: userId }, process.env.jwtKey, { expiresIn: '30d' });
     res.cookie('jwt', token, {
         httpOnly: true,
@@ -15,4 +14,3 @@ var generateToken = function (res, userId) {
     });
 };
 exports.default = generateToken;
-//# sourceMappingURL=generateToken.js.map

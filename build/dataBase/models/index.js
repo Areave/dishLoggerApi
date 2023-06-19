@@ -14,4 +14,3 @@ var productModel_1 = __importDefault(require("./productModel"));
 exports.Product = productModel_1.default;
 var dishModel_1 = __importDefault(require("./dishModel"));
 exports.Dish = dishModel_1.default;
-//# sourceMappingURL=index.js.map

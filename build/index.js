@@ -49,4 +49,3 @@ var start = function () {
 };
 start();
 module.exports = app;
-//# sourceMappingURL=index.js.map

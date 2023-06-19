@@ -130,4 +130,3 @@ var authMiddleware = function (request, response, next) {
     }
 };
 exports.authMiddleware = authMiddleware;
-//# sourceMappingURL=authMiddleware.js.map

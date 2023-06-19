@@ -68,6 +68,7 @@ userSchema.pre('save', function (next) {
         return __generator(this, function (_b) {
             switch (_b.label) {
                 case 0:
+                    console.log('pre hook');
                     if (!!this.isModified('password')) return [3 /*break*/, 1];
                     next();
                     return [3 /*break*/, 4];
@@ -95,4 +96,3 @@ userSchema.methods.matchPassword = function (enteredPassword) {
     });
 };
 module.exports = (0, mongoose_1.model)('User', userSchema);
-//# sourceMappingURL=userModel.js.map

@@ -149,4 +149,3 @@ exports.productRouter.delete('/remove_all', function (req, res) { return __await
         }
     });
 }); });
-//# sourceMappingURL=productRouter.js.map

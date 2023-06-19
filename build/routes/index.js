@@ -9,4 +9,3 @@ var authRouter_1 = require("./authRouter");
 Object.defineProperty(exports, "authRouter", { enumerable: true, get: function () { return authRouter_1.authRouter; } });
 var productRouter_1 = require("./productRouter");
 Object.defineProperty(exports, "productRouter", { enumerable: true, get: function () { return productRouter_1.productRouter; } });
-//# sourceMappingURL=index.js.map

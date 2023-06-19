@@ -24,4 +24,3 @@ var productSchema = new mongoose_1.Schema({
     },
 });
 module.exports = (0, mongoose_1.model)('Product', productSchema);
-//# sourceMappingURL=productModel.js.map
