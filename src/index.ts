@@ -6,6 +6,7 @@ import cors from 'cors';
 import {dbConnect} from './dataBase/dbService';
 import {userRouter, wordsRouter, authRouter, productRouter} from "./routes";
 import cookieParser from "cookie-parser";
+import {protect} from "./routes/middlewares/authMiddleware";
 
 
 dotenv.config();
@@ -21,7 +22,7 @@ app.use(express.urlencoded({extended: true}));
 // app.use('/users', usersRouter);
 // app.use('/words', wordsRouter);
 app.use('/api/auth', authRouter);
-app.use('/api/products', productRouter);
+app.use('/api/products', protect, productRouter);
 app.use('/api/user', userRouter);
 // app.use('/api/auth/registration', (req, res) => {
 //     res.send('auth endpoint');

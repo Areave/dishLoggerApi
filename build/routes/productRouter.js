@@ -48,7 +48,6 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.productRouter = void 0;
 var express_1 = require("express");
 var models_1 = require("./../dataBase/models");
-var authMiddleware_1 = require("./middlewares/authMiddleware");
 exports.productRouter = (0, express_1.Router)({ strict: true });
 var updateUserProducts = function (res, userId, products) { return __awaiter(void 0, void 0, void 0, function () {
     var error_1;
@@ -62,14 +61,16 @@ var updateUserProducts = function (res, userId, products) { return __awaiter(voi
                 return [2 /*return*/, res.status(201).json(products)];
             case 2:
                 error_1 = _a.sent();
-                // console.log('from productRouter', error.message);
-                return [2 /*return*/, res.status(500).json({ message: "Database problems" })];
+                return [2 /*return*/, res.status(500).json({
+                        message: "Database problems",
+                        stack: error_1.stackTrace
+                    })];
             case 3: return [2 /*return*/];
         }
     });
 }); };
 // api/products/get_all
-exports.productRouter.post('/get_all', authMiddleware_1.protect, function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
+exports.productRouter.get('/get_all', function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
     var user;
     return __generator(this, function (_a) {
         user = req.body.user;
@@ -77,36 +78,38 @@ exports.productRouter.post('/get_all', authMiddleware_1.protect, function (req, 
     });
 }); });
 // api/products/product/:id
-exports.productRouter.post('/product/:id', authMiddleware_1.protect, function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
+exports.productRouter.get('/product/:id', function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
     var user, product;
     return __generator(this, function (_a) {
-        console.log('req.params.id', req.params.id);
         user = req.body.user;
         product = user.products.find(function (product) { return product.id == req.params.id; });
-        return [2 /*return*/, res.status(201).json({ product: product })];
+        if (!product) {
+            return [2 /*return*/, res.status(400).json({
+                    message: "No such product"
+                })];
+        }
+        res.status(201).json({ product: product });
+        return [2 /*return*/];
     });
 }); });
 // api/products/add
-exports.productRouter.post('/add', authMiddleware_1.protect, function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
+exports.productRouter.post('/add', function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
     var _a, user, product, products;
     return __generator(this, function (_b) {
         switch (_b.label) {
             case 0:
-                console.log('router');
                 _a = req.body, user = _a.user, product = _a.product;
-                // console.log('req.body router', req.body);
                 if (!product) {
                     res.status(400).json({ message: "Product is null" });
                 }
                 products = __spreadArray(__spreadArray([], user.products, true), [product], false);
-                console.log(products);
                 return [4 /*yield*/, updateUserProducts(res, user._id, products)];
             case 1: return [2 /*return*/, _b.sent()];
         }
     });
 }); });
 // api/products/update
-exports.productRouter.put('/update', authMiddleware_1.protect, function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
+exports.productRouter.put('/update', function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
     var _a, user, product, products;
     return __generator(this, function (_b) {
         switch (_b.label) {
@@ -119,7 +122,7 @@ exports.productRouter.put('/update', authMiddleware_1.protect, function (req, re
     });
 }); });
 // api/products/remove
-exports.productRouter.post('/remove', authMiddleware_1.protect, function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
+exports.productRouter.delete('/remove', function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
     var _a, user, productId, products;
     return __generator(this, function (_b) {
         switch (_b.label) {
@@ -134,7 +137,7 @@ exports.productRouter.post('/remove', authMiddleware_1.protect, function (req, r
     });
 }); });
 // api/products/remove
-exports.productRouter.post('/remove_all', authMiddleware_1.protect, function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
+exports.productRouter.delete('/remove_all', function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
     var user, products;
     return __generator(this, function (_a) {
         switch (_a.label) {

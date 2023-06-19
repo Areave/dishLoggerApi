@@ -10,6 +10,7 @@ var cors_1 = __importDefault(require("cors"));
 var dbService_1 = require("./dataBase/dbService");
 var routes_1 = require("./routes");
 var cookie_parser_1 = __importDefault(require("cookie-parser"));
+var authMiddleware_1 = require("./routes/middlewares/authMiddleware");
 dotenv_1.default.config();
 var mongoUri = process.env.mongoUri;
 var port = process.env.PORT;
@@ -21,7 +22,7 @@ app.use(express_1.default.urlencoded({ extended: true }));
 // app.use('/users', usersRouter);
 // app.use('/words', wordsRouter);
 app.use('/api/auth', routes_1.authRouter);
-app.use('/api/products', routes_1.productRouter);
+app.use('/api/products', authMiddleware_1.protect, routes_1.productRouter);
 app.use('/api/user', routes_1.userRouter);
 // app.use('/api/auth/registration', (req, res) => {
 //     res.send('auth endpoint');

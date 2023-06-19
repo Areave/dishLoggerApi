@@ -97,9 +97,9 @@ exports.authRouter.post('/login', [
     (0, express_validator_1.check)('login', 'Login can\'t be empty').notEmpty(),
     (0, express_validator_1.check)('password', 'Password can\'t be empty').notEmpty(),
 ], function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
-    var loginErrors, _a, login, password, user, _b, _c, _d, error_2;
-    return __generator(this, function (_e) {
-        switch (_e.label) {
+    var loginErrors, _a, login, password, user, _b, error_2;
+    return __generator(this, function (_c) {
+        switch (_c.label) {
             case 0:
                 loginErrors = (0, express_validator_1.validationResult)(req);
                 if (!loginErrors.isEmpty()) {
@@ -108,42 +108,37 @@ exports.authRouter.post('/login', [
                             message: 'Login error'
                         })];
                 }
-                _e.label = 1;
+                _c.label = 1;
             case 1:
-                _e.trys.push([1, 7, , 8]);
+                _c.trys.push([1, 5, , 6]);
                 _a = req.body, login = _a.login, password = _a.password;
                 return [4 /*yield*/, models_1.User.findOne({ login: login })];
             case 2:
-                user = _e.sent();
+                user = _c.sent();
                 _b = !user;
                 if (_b) return [3 /*break*/, 4];
                 return [4 /*yield*/, user.matchPassword(password)];
             case 3:
-                _b = !(_e.sent());
-                _e.label = 4;
+                _b = !(_c.sent());
+                _c.label = 4;
             case 4:
-                if (!_b) return [3 /*break*/, 6];
                 // @ts-ignore
-                _d = (_c = console).log;
-                return [4 /*yield*/, user.matchPassword(password)];
-            case 5:
-                // @ts-ignore
-                _d.apply(_c, [_e.sent()]);
-                console.log(user);
-                return [2 /*return*/, res.status(400).json({ message: 'No such a user' })];
-            case 6:
+                if (_b) {
+                    console.log(user);
+                    return [2 /*return*/, res.status(400).json({ message: 'No such a user' })];
+                }
                 (0, generateToken_1.default)(res, user._id);
                 res.status(200).json({ message: 'You successfully logged in', user: user });
-                return [3 /*break*/, 8];
-            case 7:
-                error_2 = _e.sent();
+                return [3 /*break*/, 6];
+            case 5:
+                error_2 = _c.sent();
                 console.log('from authRouter', error_2.message);
                 res.status(500).json({
                     message: 'Database error',
                     stack: error_2.message
                 });
-                return [3 /*break*/, 8];
-            case 8: return [2 /*return*/];
+                return [3 /*break*/, 6];
+            case 6: return [2 /*return*/];
         }
     });
 }); });

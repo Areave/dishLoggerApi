@@ -10,47 +10,50 @@ const updateUserProducts = async (res, userId, products) => {
         await User.updateOne({_id: userId}, {products});
         return res.status(201).json(products);
     } catch (error) {
-        // console.log('from productRouter', error.message);
-        return res.status(500).json({message: "Database problems"});
+        return res.status(500).json({
+            message: "Database problems",
+            stack: error.stackTrace
+        });
     }
 };
 
 // api/products/get_all
-productRouter.post('/get_all', protect, async (req: Request, res: Response): Promise<Response> => {
+productRouter.get('/get_all', async (req: Request, res: Response): Promise<Response> => {
     const {user} = req.body;
     return res.status(200).json(user.products);
 });
 
 // api/products/product/:id
-productRouter.post('/product/:id', protect, async (req: Request, res: Response): Promise<Response> => {
-    console.log('req.params.id', req.params.id);
+productRouter.get('/product/:id', async (req: Request, res: Response): Promise<Response> => {
     const {user} = req.body;
     const product = user.products.find(product => product.id == req.params.id);
-    return res.status(201).json({product});
+    if (!product) {
+        return res.status(400).json({
+            message: "No such product"
+        });
+    }
+    res.status(201).json({product});
 });
 
 // api/products/add
-productRouter.post('/add', protect, async (req: Request, res: Response): Promise<Response> => {
-    console.log('router');
+productRouter.post('/add', async (req: Request, res: Response): Promise<Response> => {
     const {user, product} = req.body;
-    // console.log('req.body router', req.body);
     if (!product) {
         res.status(400).json({message: "Product is null"})
     }
     const products = [...user.products, product];
-    console.log(products);
     return await updateUserProducts(res, user._id, products);
 });
 
 // api/products/update
-productRouter.put('/update', protect, async (req: Request, res: Response): Promise<Response> => {
+productRouter.put('/update', async (req: Request, res: Response): Promise<Response> => {
     const {user, product} = req.body;
     const products = user.products.map(userProduct => userProduct.id == product.id ? product : userProduct);
     return await updateUserProducts(res, user._id, products);
 });
 
 // api/products/remove
-productRouter.post('/remove', protect, async (req: Request, res: Response): Promise<Response> => {
+productRouter.delete('/remove', async (req: Request, res: Response): Promise<Response> => {
     const {user, productId} = req.body;
     const products = user.products.filter(product => {
         return product.id != productId;
@@ -59,7 +62,7 @@ productRouter.post('/remove', protect, async (req: Request, res: Response): Prom
 });
 
 // api/products/remove
-productRouter.post('/remove_all', protect, async (req: Request, res: Response): Promise<Response> => {
+productRouter.delete('/remove_all', async (req: Request, res: Response): Promise<Response> => {
     const {user} = req.body;
     const products = [];
     return await updateUserProducts(res, user._id, products);

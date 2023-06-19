@@ -7,11 +7,9 @@ import {User} from '../../dataBase/models'
 dotenv.config();
 
 export const protect = asyncHandler(async (req, res, next) => {
-    console.log(req.cookies);
+
     const rawToken = req.cookies.jwt;
-
     if (rawToken) {
-
         try {
             const decoded = jwt.verify(rawToken, process.env.jwtKey);
             // @ts-ignore
@@ -23,10 +21,9 @@ export const protect = asyncHandler(async (req, res, next) => {
         }
 
     } else {
-
-        res.status(401).json({message: 'no token'});
-        // res.status(401);
-        // throw new Error('Not authorized, no token');
+        // res.status(401).json({message: 'no token'});
+        res.status(401);
+        throw new Error('Not authorized, no token');
     }
 });
 

@@ -73,7 +73,6 @@ exports.protect = (0, express_async_handler_1.default)(function (req, res, next)
     return __generator(this, function (_b) {
         switch (_b.label) {
             case 0:
-                console.log(req.cookies);
                 rawToken = req.cookies.jwt;
                 if (!rawToken) return [3 /*break*/, 5];
                 _b.label = 1;
@@ -94,8 +93,9 @@ exports.protect = (0, express_async_handler_1.default)(function (req, res, next)
                 throw new Error('Not authorized, invalid token');
             case 4: return [3 /*break*/, 6];
             case 5:
-                res.status(401).json({ message: 'no token' });
-                _b.label = 6;
+                // res.status(401).json({message: 'no token'});
+                res.status(401);
+                throw new Error('Not authorized, no token');
             case 6: return [2 /*return*/];
         }
     });
