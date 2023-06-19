@@ -88,7 +88,7 @@ exports.dishesRouter.get('/dish/:id', function (req, res) { return __awaiter(voi
                     message: "No such dish"
                 })];
         }
-        res.status(201).json({ dish: dish });
+        res.status(201).json(dish);
         return [2 /*return*/];
     });
 }); });

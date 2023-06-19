@@ -88,7 +88,7 @@ exports.productRouter.get('/product/:id', function (req, res) { return __awaiter
                     message: "No such product"
                 })];
         }
-        res.status(201).json({ product: product });
+        res.status(201).json(product);
         return [2 /*return*/];
     });
 }); });
