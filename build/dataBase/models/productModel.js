@@ -4,14 +4,17 @@ var productSchema = new mongoose_1.Schema({
     name: {
         type: String,
         required: true,
-        unique: true
     },
-    id: {
-        type: Number,
-        required: true
+    type: {
+        type: String
     },
     description: {
         type: String,
+    },
+    owner: {
+        type: mongoose_1.Types.ObjectId,
+        require: true,
+        ref: 'User'
     },
     weightOfPieceGr: {
         type: Number,

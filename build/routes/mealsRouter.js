@@ -1,4 +1,15 @@
 "use strict";
+var __assign = (this && this.__assign) || function () {
+    __assign = Object.assign || function(t) {
+        for (var s, i = 1, n = arguments.length; i < n; i++) {
+            s = arguments[i];
+            for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p))
+                t[p] = s[p];
+        }
+        return t;
+    };
+    return __assign.apply(this, arguments);
+};
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -48,17 +59,44 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.mealsRouter = void 0;
 var express_1 = require("express");
 var models_1 = require("./../dataBase/models");
+var mongodb_1 = require("mongodb");
 exports.mealsRouter = (0, express_1.Router)({ strict: true });
+var createObjectId = function (id) {
+    var objectId;
+    try {
+        objectId = new mongodb_1.ObjectId(id);
+    }
+    catch (error) {
+        throw new Error();
+    }
+    return objectId;
+};
 var updateUserMeals = function (res, userId, meals) { return __awaiter(void 0, void 0, void 0, function () {
-    var error_1;
+    var updatedMeals, error_1;
     return __generator(this, function (_a) {
         switch (_a.label) {
             case 0:
                 _a.trys.push([0, 2, , 3]);
-                return [4 /*yield*/, models_1.User.updateOne({ _id: userId }, { meals: meals })];
+                return [4 /*yield*/, Promise.all([models_1.User.updateOne({ _id: userId }, { meals: meals }),
+                        models_1.Meal.find({ owner: userId })
+                            // .populate('ingridients')
+                            //     .populate({
+                            //         path: 'dishes',
+                            //         populate: { path: 'products' }})
+                            .populate({
+                            path: 'ingridients',
+                            populate: { path: 'products' }
+                        })
+                            .populate({
+                            path: 'ingridients',
+                            populate: { path: 'dishes' }
+                        })
+                            // .populate('ingridients')
+                            // .populate('ingridients.dishes')
+                            .select('-owner')])];
             case 1:
-                _a.sent();
-                return [2 /*return*/, res.status(201).json(meals)];
+                updatedMeals = _a.sent();
+                return [2 /*return*/, res.status(201).json(updatedMeals[1])];
             case 2:
                 error_1 = _a.sent();
                 return [2 /*return*/, res.status(500).json({
@@ -71,40 +109,79 @@ var updateUserMeals = function (res, userId, meals) { return __awaiter(void 0, v
 }); };
 // api/meals/get_all
 exports.mealsRouter.get('/get_all', function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
-    var user;
+    var user, userMeals;
     return __generator(this, function (_a) {
-        user = req.body.user;
-        return [2 /*return*/, res.status(200).json(user.meals)];
+        switch (_a.label) {
+            case 0:
+                user = req.body.user;
+                return [4 /*yield*/, models_1.Meal.find({ owner: user._id }).populate('dishes').populate('products')];
+            case 1:
+                userMeals = _a.sent();
+                return [2 /*return*/, res.status(200).json(userMeals)];
+        }
     });
 }); });
-// api/meals/product/:id
+// api/meals/meal/:id
 exports.mealsRouter.get('/meal/:id', function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
-    var user, meal;
+    var user, objectId, meal;
     return __generator(this, function (_a) {
-        user = req.body.user;
-        meal = user.meals.find(function (meal) { return meal.id == req.params.id; });
-        if (!meal) {
-            return [2 /*return*/, res.status(400).json({
-                    message: "No such meal"
-                })];
+        switch (_a.label) {
+            case 0:
+                user = req.body.user;
+                try {
+                    objectId = createObjectId(req.params.id);
+                }
+                catch (error) {
+                    return [2 /*return*/, res.status(400).json({
+                            message: 'Bad ID link',
+                            stack: error.stackTrace
+                        })];
+                }
+                return [4 /*yield*/, models_1.Meal.findOne({ owner: user._id, _id: objectId }).populate({
+                        path: 'ingridients', populate: [
+                            {
+                                path: 'dishes',
+                                select: 'name',
+                            },
+                        ]
+                    })];
+            case 1:
+                meal = _a.sent();
+                if (!meal) {
+                    return [2 /*return*/, res.status(400).json({
+                            message: "No such meal"
+                        })];
+                }
+                res.status(201).json(meal);
+                return [2 /*return*/];
         }
-        res.status(201).json(meal);
-        return [2 /*return*/];
     });
 }); });
 // api/meals/add
 exports.mealsRouter.post('/add', function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
-    var _a, user, meal, meals;
+    var _a, user, meal, candidate, newItem, meals;
     return __generator(this, function (_b) {
         switch (_b.label) {
             case 0:
                 _a = req.body, user = _a.user, meal = _a.meal;
                 if (!meal) {
-                    res.status(400).json({ message: "meal is null" });
+                    res.status(400).json({ message: "Meal is null" });
                 }
-                meals = __spreadArray(__spreadArray([], user.meals, true), [meal], false);
+                meal.owner = user._id;
+                return [4 /*yield*/, models_1.Meal.findOne({ name: meal.name, owner: user._id })];
+            case 1:
+                candidate = _b.sent();
+                if (candidate) {
+                    return [2 /*return*/, res.status(400).json({
+                            message: "Duplicate name: " + meal.name
+                        })];
+                }
+                return [4 /*yield*/, models_1.Meal.create(__assign({}, meal))];
+            case 2:
+                newItem = _b.sent();
+                meals = __spreadArray(__spreadArray([], user.meals, true), [newItem._id], false);
                 return [4 /*yield*/, updateUserMeals(res, user._id, meals)];
-            case 1: return [2 /*return*/, _b.sent()];
+            case 3: return [2 /*return*/, _b.sent()];
         }
     });
 }); });
@@ -115,24 +192,41 @@ exports.mealsRouter.put('/update', function (req, res) { return __awaiter(void 0
         switch (_b.label) {
             case 0:
                 _a = req.body, user = _a.user, meal = _a.meal;
-                meals = user.meals.map(function (userDish) { return userDish.id == meal.id ? meal : userDish; });
-                return [4 /*yield*/, updateUserMeals(res, user._id, meals)];
-            case 1: return [2 /*return*/, _b.sent()];
+                meal.owner = user._id;
+                return [4 /*yield*/, models_1.Meal.updateOne({ _id: meal._id }, __assign({}, meal))];
+            case 1:
+                _b.sent();
+                return [4 /*yield*/, models_1.Meal.find({ owner: user._id }).populate('products').select('-owner')];
+            case 2:
+                meals = _b.sent();
+                return [2 /*return*/, res.status(201).json(meals)];
         }
     });
 }); });
 // api/meals/remove
 exports.mealsRouter.delete('/remove', function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
-    var _a, user, mealId, meals;
+    var _a, user, mealId, objectId, meals;
     return __generator(this, function (_b) {
         switch (_b.label) {
             case 0:
                 _a = req.body, user = _a.user, mealId = _a.mealId;
+                try {
+                    objectId = createObjectId(mealId);
+                }
+                catch (error) {
+                    return [2 /*return*/, res.status(400).json({
+                            message: 'Bad ID link',
+                            stack: error.stackTrace
+                        })];
+                }
+                return [4 /*yield*/, models_1.Meal.deleteOne({ _id: objectId })];
+            case 1:
+                _b.sent();
                 meals = user.meals.filter(function (meal) {
-                    return meal.id != mealId;
+                    return meal._id != mealId;
                 });
                 return [4 /*yield*/, updateUserMeals(res, user._id, meals)];
-            case 1: return [2 /*return*/, _b.sent()];
+            case 2: return [2 /*return*/, _b.sent()];
         }
     });
 }); });
@@ -143,9 +237,12 @@ exports.mealsRouter.delete('/remove_all', function (req, res) { return __awaiter
         switch (_a.label) {
             case 0:
                 user = req.body.user;
+                return [4 /*yield*/, models_1.Meal.deleteMany({ owner: user._id })];
+            case 1:
+                _a.sent();
                 meals = [];
                 return [4 /*yield*/, updateUserMeals(res, user._id, meals)];
-            case 1: return [2 /*return*/, _a.sent()];
+            case 2: return [2 /*return*/, _a.sent()];
         }
     });
 }); });

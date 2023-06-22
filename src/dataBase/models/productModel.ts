@@ -5,14 +5,17 @@ const productSchema = new Schema({
     name: {
         type: String,
         required: true,
-        unique: true
     },
-    id: {
-      type: Number,
-      required: true
+    type: {
+        type: String
     },
     description: {
         type: String,
+    },
+    owner: {
+        type: Types.ObjectId,
+        require: true,
+        ref: 'User'
     },
     weightOfPieceGr: {
         type: Number,

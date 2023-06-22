@@ -1,4 +1,15 @@
 "use strict";
+var __assign = (this && this.__assign) || function () {
+    __assign = Object.assign || function(t) {
+        for (var s, i = 1, n = arguments.length; i < n; i++) {
+            s = arguments[i];
+            for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p))
+                t[p] = s[p];
+        }
+        return t;
+    };
+    return __assign.apply(this, arguments);
+};
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -48,17 +59,29 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.productRouter = void 0;
 var express_1 = require("express");
 var models_1 = require("./../dataBase/models");
+var mongodb_1 = require("mongodb");
 exports.productRouter = (0, express_1.Router)({ strict: true });
+var createObjectId = function (id) {
+    var objectId;
+    try {
+        objectId = new mongodb_1.ObjectId(id);
+    }
+    catch (error) {
+        throw new Error();
+    }
+    return objectId;
+};
 var updateUserProducts = function (res, userId, products) { return __awaiter(void 0, void 0, void 0, function () {
-    var error_1;
+    var updatedProducts, error_1;
     return __generator(this, function (_a) {
         switch (_a.label) {
             case 0:
                 _a.trys.push([0, 2, , 3]);
-                return [4 /*yield*/, models_1.User.updateOne({ _id: userId }, { products: products })];
+                return [4 /*yield*/, Promise.all([models_1.User.updateOne({ _id: userId }, { products: products }),
+                        models_1.Product.find({ owner: userId }).select('-owner')])];
             case 1:
-                _a.sent();
-                return [2 /*return*/, res.status(201).json(products)];
+                updatedProducts = _a.sent();
+                return [2 /*return*/, res.status(201).json(updatedProducts[1])];
             case 2:
                 error_1 = _a.sent();
                 return [2 /*return*/, res.status(500).json({
@@ -71,30 +94,50 @@ var updateUserProducts = function (res, userId, products) { return __awaiter(voi
 }); };
 // api/products/get_all
 exports.productRouter.get('/get_all', function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
-    var user;
+    var user, userProducts;
     return __generator(this, function (_a) {
-        user = req.body.user;
-        return [2 /*return*/, res.status(200).json(user.products)];
+        switch (_a.label) {
+            case 0:
+                user = req.body.user;
+                return [4 /*yield*/, models_1.Product.find({ owner: user._id })];
+            case 1:
+                userProducts = _a.sent();
+                return [2 /*return*/, res.status(200).json(userProducts)];
+        }
     });
 }); });
 // api/products/product/:id
 exports.productRouter.get('/product/:id', function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
-    var user, product;
+    var user, objectId, product;
     return __generator(this, function (_a) {
-        user = req.body.user;
-        product = user.products.find(function (product) { return product.id == req.params.id; });
-        if (!product) {
-            return [2 /*return*/, res.status(400).json({
-                    message: "No such product"
-                })];
+        switch (_a.label) {
+            case 0:
+                user = req.body.user;
+                try {
+                    objectId = createObjectId(req.params.id);
+                }
+                catch (error) {
+                    return [2 /*return*/, res.status(400).json({
+                            message: 'Bad ID link',
+                            stack: error.stackTrace
+                        })];
+                }
+                return [4 /*yield*/, models_1.Product.findOne({ owner: user._id, _id: objectId })];
+            case 1:
+                product = _a.sent();
+                if (!product) {
+                    return [2 /*return*/, res.status(400).json({
+                            message: "No such product"
+                        })];
+                }
+                res.status(201).json(product);
+                return [2 /*return*/];
         }
-        res.status(201).json(product);
-        return [2 /*return*/];
     });
 }); });
 // api/products/add
 exports.productRouter.post('/add', function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
-    var _a, user, product, products;
+    var _a, user, product, candidate, newProduct, products;
     return __generator(this, function (_b) {
         switch (_b.label) {
             case 0:
@@ -102,9 +145,21 @@ exports.productRouter.post('/add', function (req, res) { return __awaiter(void 0
                 if (!product) {
                     res.status(400).json({ message: "Product is null" });
                 }
-                products = __spreadArray(__spreadArray([], user.products, true), [product], false);
+                return [4 /*yield*/, models_1.Product.findOne({ name: product.name, owner: user._id })];
+            case 1:
+                candidate = _b.sent();
+                if (candidate) {
+                    return [2 /*return*/, res.status(400).json({
+                            message: "Duplicate name: " + product.name
+                        })];
+                }
+                product.owner = user._id;
+                return [4 /*yield*/, models_1.Product.create(__assign({}, product))];
+            case 2:
+                newProduct = _b.sent();
+                products = __spreadArray(__spreadArray([], user.products, true), [newProduct._id], false);
                 return [4 /*yield*/, updateUserProducts(res, user._id, products)];
-            case 1: return [2 /*return*/, _b.sent()];
+            case 3: return [2 /*return*/, _b.sent()];
         }
     });
 }); });
@@ -115,24 +170,41 @@ exports.productRouter.put('/update', function (req, res) { return __awaiter(void
         switch (_b.label) {
             case 0:
                 _a = req.body, user = _a.user, product = _a.product;
-                products = user.products.map(function (userProduct) { return userProduct.id == product.id ? product : userProduct; });
-                return [4 /*yield*/, updateUserProducts(res, user._id, products)];
-            case 1: return [2 /*return*/, _b.sent()];
+                product.owner = user._id;
+                return [4 /*yield*/, models_1.Product.updateOne({ _id: product._id }, __assign({}, product))];
+            case 1:
+                _b.sent();
+                return [4 /*yield*/, models_1.Product.find({ owner: user._id }).select('-owner')];
+            case 2:
+                products = _b.sent();
+                return [2 /*return*/, res.status(201).json(products)];
         }
     });
 }); });
 // api/products/remove
 exports.productRouter.delete('/remove', function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
-    var _a, user, productId, products;
+    var _a, user, productId, objectId, products;
     return __generator(this, function (_b) {
         switch (_b.label) {
             case 0:
                 _a = req.body, user = _a.user, productId = _a.productId;
+                try {
+                    objectId = createObjectId(productId);
+                }
+                catch (error) {
+                    return [2 /*return*/, res.status(400).json({
+                            message: 'Bad ID link',
+                            stack: error.stackTrace
+                        })];
+                }
+                return [4 /*yield*/, models_1.Product.deleteOne({ _id: objectId })];
+            case 1:
+                _b.sent();
                 products = user.products.filter(function (product) {
-                    return product.id != productId;
+                    return product._id != productId;
                 });
                 return [4 /*yield*/, updateUserProducts(res, user._id, products)];
-            case 1: return [2 /*return*/, _b.sent()];
+            case 2: return [2 /*return*/, _b.sent()];
         }
     });
 }); });
@@ -143,9 +215,12 @@ exports.productRouter.delete('/remove_all', function (req, res) { return __await
         switch (_a.label) {
             case 0:
                 user = req.body.user;
+                return [4 /*yield*/, models_1.Product.deleteMany({ owner: user._id })];
+            case 1:
+                _a.sent();
                 products = [];
                 return [4 /*yield*/, updateUserProducts(res, user._id, products)];
-            case 1: return [2 /*return*/, _a.sent()];
+            case 2: return [2 /*return*/, _a.sent()];
         }
     });
 }); });

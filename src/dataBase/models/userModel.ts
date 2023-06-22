@@ -19,9 +19,10 @@ const userSchema = new Schema({
     dailyStats: {
         type: Array
     },
-    products: {
-        type: Array,
-    },
+    products: [{
+        type: Types.ObjectId,
+        ref: 'Product'
+    }],
     dishes: {
         type: Array,
     },

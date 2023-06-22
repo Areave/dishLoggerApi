@@ -162,7 +162,7 @@ exports.userRouter.post('/logout', function (req, res) {
 });
 // api/auth/get
 exports.userRouter.get('/get', authMiddleware_1.protect, function (req, res) {
-    res.status(200).json(req.body.user);
+    res.status(200).json(req.body.user || {});
 });
 // api/auth/update
 exports.userRouter.put('/update', authMiddleware_1.protect, function (req, res) { return __awaiter(void 0, void 0, void 0, function () {

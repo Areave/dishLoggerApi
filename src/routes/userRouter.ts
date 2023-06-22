@@ -93,7 +93,7 @@ userRouter.post('/logout', (req: Request, res: Response) => {
 
 // api/auth/get
 userRouter.get('/get', protect, (req: Request, res: Response) => {
-    res.status(200).json(req.body.user);
+    res.status(200).json(req.body.user || {});
 });
 
 // api/auth/update

@@ -38,68 +38,52 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
-var mongoose_1 = require("mongoose");
-var bcryptjs_1 = __importDefault(require("bcryptjs"));
-var userSchema = new mongoose_1.Schema({
-    name: {
-        type: String
-    },
-    login: {
-        type: String,
-        required: true,
-    },
-    password: {
-        type: String,
-        required: true,
-    },
-    intakeData: {
-        type: Object
-    },
-    dailyStats: {
-        type: Array
-    },
-    products: [{
-            type: mongoose_1.Types.ObjectId,
-            ref: 'Product'
-        }],
-    dishes: {
-        type: Array,
-    },
-    meals: {
-        type: Array,
-    },
-}, { timestamps: true });
-userSchema.pre('save', function (next) {
-    return __awaiter(this, void 0, void 0, function () {
-        var salt, _a;
-        return __generator(this, function (_b) {
-            switch (_b.label) {
-                case 0:
-                    console.log('pre hook');
-                    if (!!this.isModified('password')) return [3 /*break*/, 1];
-                    next();
-                    return [3 /*break*/, 4];
-                case 1: return [4 /*yield*/, bcryptjs_1.default.genSalt(10)];
-                case 2:
-                    salt = _b.sent();
-                    _a = this;
-                    return [4 /*yield*/, bcryptjs_1.default.hash(this.password, salt)];
-                case 3:
-                    _a.password = _b.sent();
-                    _b.label = 4;
-                case 4: return [2 /*return*/];
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.rebaseIngridientsMiddleware = void 0;
+var express_async_handler_1 = __importDefault(require("express-async-handler"));
+exports.rebaseIngridientsMiddleware = (0, express_async_handler_1.default)(function (req, res, next) { return __awaiter(void 0, void 0, void 0, function () {
+    var ingridients, ingridientsIds, ingridientsAmount;
+    return __generator(this, function (_a) {
+        console.log('req.body.dish', req.body.dish);
+        if (!req.body.dish) {
+            res.status(400).json({ message: "Dish is null" });
+        }
+        if (!req.body.dish.ingridients) {
+            return [2 /*return*/, next()];
+        }
+        ingridients = req.body.dish.ingridients;
+        ingridientsIds = {};
+        ingridientsAmount = {};
+        ingridients.forEach(function (ingridientObject) {
+            var field;
+            switch (ingridientObject.ingridient.type) {
+                case 'dish':
+                    field = 'dishes';
+                    break;
+                case 'product':
+                    field = 'products';
+                    break;
+                default: field = 'products';
+            }
+            if (ingridientsIds[field]) {
+                ingridientsIds[field].push(ingridientObject.ingridient._id);
+            }
+            else {
+                ingridientsIds[field] = [ingridientObject.ingridient._id];
+            }
+            if (ingridientsAmount[field]) {
+                ingridientsAmount[field].push(ingridientObject.amount);
+            }
+            else {
+                ingridientsAmount[field] = [ingridientObject.amount];
             }
         });
+        req.body.dish.ingridientsIds = ingridientsIds;
+        req.body.dish.ingridientsAmount = ingridientsAmount;
+        req.body.dish.owner = req.body.user._id;
+        // delete req.body.dish.rawIngridients;
+        console.log('req.body.dish', req.body.dish);
+        next();
+        return [2 /*return*/];
     });
-});
-userSchema.methods.matchPassword = function (enteredPassword) {
-    return __awaiter(this, void 0, void 0, function () {
-        return __generator(this, function (_a) {
-            switch (_a.label) {
-                case 0: return [4 /*yield*/, bcryptjs_1.default.compare(enteredPassword, this.password)];
-                case 1: return [2 /*return*/, _a.sent()];
-            }
-        });
-    });
-};
-module.exports = (0, mongoose_1.model)('User', userSchema);
+}); });
