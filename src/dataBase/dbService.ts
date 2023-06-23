@@ -3,6 +3,7 @@ import mongoose from 'mongoose'
 export const dbConnect = async (uri) => {
     let connect;
     try {
+        console.log(uri);
         connect = await mongoose.connect(uri);
     } catch (error) {
         console.log('database connected error', error.message);
