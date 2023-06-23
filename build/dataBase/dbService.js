@@ -6,7 +6,13 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.addInstance = exports.dbConnect = void 0;
 var mongoose_1 = __importDefault(require("mongoose"));
 var dbConnect = function (uri) {
-    return mongoose_1.default.connect(uri);
+    try {
+        return mongoose_1.default.connect(uri);
+    }
+    catch (error) {
+        console.log('database connected error', error.message);
+        process.exit(1);
+    }
 };
 exports.dbConnect = dbConnect;
 var addInstance = function (Schema, params) {

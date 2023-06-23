@@ -9,7 +9,7 @@
     "watch": "tsc -w",
     "build": "tsc",
     "buildev": "tsc && node .",
-    "start": "node .",
+    "start": "node build/index.js",
     "server:dev": "concurrently \"tsc -w --preserveWatchOutput\" \"nodemon index.js\""
   },
   "keywords": [],

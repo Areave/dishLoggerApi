@@ -143,20 +143,6 @@ exports.dishesRouter.post('/add', rebaseIngridientsMiddleware_1.rebaseIngridient
         }
     });
 }); });
-// api/dishes/get_all
-exports.dishesRouter.get('/get_all', function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
-    var user, userDishes;
-    return __generator(this, function (_a) {
-        switch (_a.label) {
-            case 0:
-                user = req.body.user;
-                return [4 /*yield*/, models_1.Dish.find({ owner: user._id })];
-            case 1:
-                userDishes = _a.sent();
-                return [2 /*return*/, res.status(200).json(userDishes)];
-        }
-    });
-}); });
 // api/dishes/dish/:id
 exports.dishesRouter.get('/dish/:id', function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
     var user, objectId, dish;
@@ -181,8 +167,23 @@ exports.dishesRouter.get('/dish/:id', function (req, res) { return __awaiter(voi
                             message: "No such dish"
                         })];
                 }
+                dish = rebaseIngridients([dish])[0];
                 res.status(201).json(dish);
                 return [2 /*return*/];
+        }
+    });
+}); });
+// api/dishes/get_all
+exports.dishesRouter.get('/get_all', function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
+    var user, userDishes;
+    return __generator(this, function (_a) {
+        switch (_a.label) {
+            case 0:
+                user = req.body.user;
+                return [4 /*yield*/, models_1.Dish.find({ owner: user._id })];
+            case 1:
+                userDishes = _a.sent();
+                return [2 /*return*/, res.status(200).json(userDishes)];
         }
     });
 }); });
