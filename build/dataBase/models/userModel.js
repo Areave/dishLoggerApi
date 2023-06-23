@@ -76,6 +76,8 @@ userSchema.pre('save', function (next) {
             switch (_b.label) {
                 case 0:
                     console.log('pre hook');
+                    console.log('this.password', this.password);
+                    console.log('this.isModified(\'password\')', this.isModified('password'));
                     if (!!this.isModified('password')) return [3 /*break*/, 1];
                     next();
                     return [3 /*break*/, 4];

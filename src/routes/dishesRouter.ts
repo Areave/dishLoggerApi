@@ -1,61 +1,16 @@
 import {Router, Request, Response} from 'express';
 import {User, Dish} from './../dataBase/models';
-import {ObjectId} from "mongodb";
 import {rebaseIngridientsMiddleware} from "./middlewares/rebaseIngridientsMiddleware";
+import generateObjectId from "../utils/generateObjectId";
+import rebaseIngridients from "../utils/rebaseIngridients";
 
 export const dishesRouter = Router({strict: true});
-
-const createObjectId = (id: string) => {
-    let objectId;
-    try {
-        objectId = new ObjectId(id);
-    } catch (error) {
-        throw new Error();
-    }
-    return objectId;
-};
-
-const rebaseIngridients = function (doc) {
-
-    if (!doc.length) {
-        return doc;
-    }
-
-    // console.log(doc);
-    doc.forEach( docItem => {
-
-        // @ts-ignore
-        const ingridientsIds = docItem.ingridientsIds;
-        // @ts-ignore
-        const ingridientsAmount = docItem.ingridientsAmount;
-        const ingridients = [];
-
-        ingridientsIds.products.forEach((ingridientObject, index) => {
-            ingridients.push({ingridient: ingridientObject, amount: ingridientsAmount.products[index]})
-        });
-
-        console.log('ingridients',ingridients);
-
-
-        docItem.ingridientsIds = '';
-        docItem.ingridientsAmount = '';
-        // @ts-ignore
-        docItem.ingridients = ingridients;
-
-        console.log("docItem", docItem);
-
-
-    });
-
-    return doc;
-
-};
 
 const updateUserDishes = async (res, userId, dishes) => {
     try {
         const promiseAllArray = await Promise.all([
             User.updateOne({_id: userId}, {dishes}),
-            Dish.find({owner: userId}).populate({path: 'ingridientsIds', populate: 'products'})
+            Dish.find({owner: userId}).populate('ingridientsIds.products')
         ]);
         const updatedDishesArray = rebaseIngridients(promiseAllArray[1]);
         return res.status(201).json(updatedDishesArray);
@@ -76,7 +31,6 @@ dishesRouter.post('/add', rebaseIngridientsMiddleware, async (req: Request, res:
             message: "Duplicate name: " + dish.name
         });
     }
-    console.log('/add');
     const newItem = await Dish.create({...dish});
     const dishes = [...user.dishes, newItem._id];
     return await updateUserDishes(res, user._id, dishes);
@@ -87,7 +41,7 @@ dishesRouter.get('/dish/:id', async (req: Request, res: Response): Promise<Respo
     const {user} = req.body;
     let objectId;
     try {
-        objectId = createObjectId(req.params.id);
+        objectId = generateObjectId(req.params.id);
     } catch (error) {
         return res.status(400).json({
             message: 'Bad ID link',
@@ -125,7 +79,7 @@ dishesRouter.delete('/remove', async (req: Request, res: Response): Promise<Resp
     const {user, dishId} = req.body;
     let objectId;
     try {
-        objectId = createObjectId(dishId);
+        objectId = generateObjectId(dishId);
     } catch (error) {
         return res.status(400).json({
             message: 'Bad ID link',

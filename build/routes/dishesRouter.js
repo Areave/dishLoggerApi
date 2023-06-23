@@ -55,46 +55,17 @@ var __spreadArray = (this && this.__spreadArray) || function (to, from, pack) {
     }
     return to.concat(ar || Array.prototype.slice.call(from));
 };
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.dishesRouter = void 0;
 var express_1 = require("express");
 var models_1 = require("./../dataBase/models");
-var mongodb_1 = require("mongodb");
 var rebaseIngridientsMiddleware_1 = require("./middlewares/rebaseIngridientsMiddleware");
+var generateObjectId_1 = __importDefault(require("../utils/generateObjectId"));
+var rebaseIngridients_1 = __importDefault(require("../utils/rebaseIngridients"));
 exports.dishesRouter = (0, express_1.Router)({ strict: true });
-var createObjectId = function (id) {
-    var objectId;
-    try {
-        objectId = new mongodb_1.ObjectId(id);
-    }
-    catch (error) {
-        throw new Error();
-    }
-    return objectId;
-};
-var rebaseIngridients = function (doc) {
-    if (!doc.length) {
-        return doc;
-    }
-    // console.log(doc);
-    doc.forEach(function (docItem) {
-        // @ts-ignore
-        var ingridientsIds = docItem.ingridientsIds;
-        // @ts-ignore
-        var ingridientsAmount = docItem.ingridientsAmount;
-        var ingridients = [];
-        ingridientsIds.products.forEach(function (ingridientObject, index) {
-            ingridients.push({ ingridient: ingridientObject, amount: ingridientsAmount.products[index] });
-        });
-        console.log('ingridients', ingridients);
-        docItem.ingridientsIds = '';
-        docItem.ingridientsAmount = '';
-        // @ts-ignore
-        docItem.ingridients = ingridients;
-        console.log("docItem", docItem);
-    });
-    return doc;
-};
 var updateUserDishes = function (res, userId, dishes) { return __awaiter(void 0, void 0, void 0, function () {
     var promiseAllArray, updatedDishesArray, error_1;
     return __generator(this, function (_a) {
@@ -103,11 +74,12 @@ var updateUserDishes = function (res, userId, dishes) { return __awaiter(void 0,
                 _a.trys.push([0, 2, , 3]);
                 return [4 /*yield*/, Promise.all([
                         models_1.User.updateOne({ _id: userId }, { dishes: dishes }),
-                        models_1.Dish.find({ owner: userId }).populate({ path: 'ingridientsIds', populate: 'products' })
+                        // Dish.find({owner: userId}).populate({path: 'ingridientsIds', populate: 'products'})
+                        models_1.Dish.find({ owner: userId }).populate('ingridientsIds.products')
                     ])];
             case 1:
                 promiseAllArray = _a.sent();
-                updatedDishesArray = rebaseIngridients(promiseAllArray[1]);
+                updatedDishesArray = (0, rebaseIngridients_1.default)(promiseAllArray[1]);
                 return [2 /*return*/, res.status(201).json(updatedDishesArray)];
             case 2:
                 error_1 = _a.sent();
@@ -151,7 +123,7 @@ exports.dishesRouter.get('/dish/:id', function (req, res) { return __awaiter(voi
             case 0:
                 user = req.body.user;
                 try {
-                    objectId = createObjectId(req.params.id);
+                    objectId = (0, generateObjectId_1.default)(req.params.id);
                 }
                 catch (error) {
                     return [2 /*return*/, res.status(400).json({
@@ -167,7 +139,7 @@ exports.dishesRouter.get('/dish/:id', function (req, res) { return __awaiter(voi
                             message: "No such dish"
                         })];
                 }
-                dish = rebaseIngridients([dish])[0];
+                dish = (0, rebaseIngridients_1.default)([dish])[0];
                 res.status(201).json(dish);
                 return [2 /*return*/];
         }
@@ -213,7 +185,7 @@ exports.dishesRouter.delete('/remove', function (req, res) { return __awaiter(vo
             case 0:
                 _a = req.body, user = _a.user, dishId = _a.dishId;
                 try {
-                    objectId = createObjectId(dishId);
+                    objectId = (0, generateObjectId_1.default)(dishId);
                 }
                 catch (error) {
                     return [2 /*return*/, res.status(400).json({

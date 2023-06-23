@@ -44,7 +44,7 @@ var express_async_handler_1 = __importDefault(require("express-async-handler"));
 exports.rebaseIngridientsMiddleware = (0, express_async_handler_1.default)(function (req, res, next) { return __awaiter(void 0, void 0, void 0, function () {
     var ingridients, ingridientsIds, ingridientsAmount;
     return __generator(this, function (_a) {
-        console.log('req.body.dish', req.body.dish);
+        // console.log('req.body.dish', req.body.dish);
         if (!req.body.dish) {
             res.status(400).json({ message: "Dish is null" });
         }
@@ -81,8 +81,6 @@ exports.rebaseIngridientsMiddleware = (0, express_async_handler_1.default)(funct
         req.body.dish.ingridientsIds = ingridientsIds;
         req.body.dish.ingridientsAmount = ingridientsAmount;
         req.body.dish.owner = req.body.user._id;
-        // delete req.body.dish.rawIngridients;
-        console.log('req.body.dish', req.body.dish);
         next();
         return [2 /*return*/];
     });

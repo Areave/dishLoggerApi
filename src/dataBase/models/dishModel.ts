@@ -36,7 +36,6 @@ const dishSchema = new Schema({
 });
 
 
-
 // dishSchema.post('populate', function (doc, next){
 //
 //     console.log('postfind start, doc', doc);

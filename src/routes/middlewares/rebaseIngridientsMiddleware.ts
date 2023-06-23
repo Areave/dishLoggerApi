@@ -2,7 +2,7 @@ import asyncHandler from "express-async-handler";
 
 export const rebaseIngridientsMiddleware = asyncHandler(async (req, res, next) => {
 
-    console.log('req.body.dish', req.body.dish);
+    // console.log('req.body.dish', req.body.dish);
 
     if (!req.body.dish) {
         res.status(400).json({message: "Dish is null"})
@@ -26,6 +26,7 @@ export const rebaseIngridientsMiddleware = asyncHandler(async (req, res, next) =
 
         let field;
 
+
         switch (ingridientObject.ingridient.type) {
             case 'dish': field = 'dishes';
                 break;
@@ -35,7 +36,7 @@ export const rebaseIngridientsMiddleware = asyncHandler(async (req, res, next) =
         }
 
         if (ingridientsIds[field]) {
-            ingridientsIds[field].push(ingridientObject.ingridient._id)
+            ingridientsIds[field].push(ingridientObject.ingridient._id);
         } else {
             ingridientsIds[field] = [ingridientObject.ingridient._id];
         }
@@ -50,7 +51,5 @@ export const rebaseIngridientsMiddleware = asyncHandler(async (req, res, next) =
     req.body.dish.ingridientsIds = ingridientsIds;
     req.body.dish.ingridientsAmount = ingridientsAmount;
     req.body.dish.owner = req.body.user._id;
-    // delete req.body.dish.rawIngridients;
-    console.log('req.body.dish', req.body.dish);
     next();
 });
