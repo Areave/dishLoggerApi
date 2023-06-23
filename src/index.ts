@@ -41,11 +41,10 @@ app.get('/', (req, res)=>{
 // });
 
 
-const start = () => {
+const start = async () => {
     try {
-        dbConnect(mongoUri).then(()=> {
-            app.listen(port, () => console.log(`Running on port ${port}`));
-        });
+        await dbConnect(mongoUri)
+        app.listen(port, () => console.log(`Running on port ${port}`));
     } catch (e) {
         console.log('database connected error', e.message);
         process.exit(1);
