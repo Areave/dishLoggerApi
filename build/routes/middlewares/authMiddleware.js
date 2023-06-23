@@ -62,40 +62,42 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.authMiddleware = exports.protect = void 0;
+exports.authMiddleware = exports.verifyUser = void 0;
 var jwt = __importStar(require("jsonwebtoken"));
 var dotenv_1 = __importDefault(require("dotenv"));
 var express_async_handler_1 = __importDefault(require("express-async-handler"));
 var models_1 = require("../../dataBase/models");
 dotenv_1.default.config();
-exports.protect = (0, express_async_handler_1.default)(function (req, res, next) { return __awaiter(void 0, void 0, void 0, function () {
-    var rawToken, decoded, _a, error_1;
-    return __generator(this, function (_b) {
-        switch (_b.label) {
+exports.verifyUser = (0, express_async_handler_1.default)(function (req, res, next) { return __awaiter(void 0, void 0, void 0, function () {
+    var rawToken, decoded, user, error_1;
+    return __generator(this, function (_a) {
+        switch (_a.label) {
             case 0:
                 rawToken = req.cookies.jwt;
                 if (!rawToken) return [3 /*break*/, 5];
-                _b.label = 1;
+                _a.label = 1;
             case 1:
-                _b.trys.push([1, 3, , 4]);
+                _a.trys.push([1, 3, , 4]);
                 decoded = jwt.verify(rawToken, process.env.jwtKey);
-                // @ts-ignore
-                _a = req.body;
                 return [4 /*yield*/, models_1.User.findById(decoded.userId).select('-password')];
             case 2:
-                // @ts-ignore
-                _a.user = _b.sent();
-                next();
+                user = _a.sent();
+                if (!user) {
+                    res.status(401).json({ message: 'No such user' });
+                }
+                else {
+                    req.body.user = user;
+                    next();
+                }
                 return [3 /*break*/, 4];
             case 3:
-                error_1 = _b.sent();
-                res.status(401);
-                throw new Error('Not authorized, invalid token');
+                error_1 = _a.sent();
+                res.status(401).json({ message: 'Not authorized, invalid token', stack: error_1.message });
+                return [3 /*break*/, 4];
             case 4: return [3 /*break*/, 6];
             case 5:
-                // res.status(401).json({message: 'no token'});
-                res.status(401);
-                throw new Error('Not authorized, no token');
+                res.status(401).json({ message: 'Not authorized, no token' });
+                _a.label = 6;
             case 6: return [2 /*return*/];
         }
     });

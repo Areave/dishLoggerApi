@@ -57,10 +57,10 @@ app.use((0, cors_1.default)());
 app.use(express_1.default.urlencoded({ extended: true }));
 // app.use('/users', usersRouter);
 // app.use('/words', wordsRouter);
-app.use('/api/auth', routes_1.userRouter);
-app.use('/api/products', authMiddleware_1.protect, routes_1.productRouter);
-app.use('/api/dishes', authMiddleware_1.protect, routes_1.dishesRouter);
-app.use('/api/meals', authMiddleware_1.protect, routes_1.mealsRouter);
+app.use('/api/users', routes_1.userRouter);
+app.use('/api/products', authMiddleware_1.verifyUser, routes_1.productRouter);
+app.use('/api/dishes', authMiddleware_1.verifyUser, routes_1.dishesRouter);
+app.use('/api/meals', authMiddleware_1.verifyUser, routes_1.mealsRouter);
 // app.use('/api/auth/registration', (req, res) => {
 //     res.send('auth endpoint');
 // });

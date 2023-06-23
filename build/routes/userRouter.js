@@ -49,8 +49,8 @@ var authMiddleware_1 = require("./middlewares/authMiddleware");
 var bcryptjs_1 = __importDefault(require("bcryptjs"));
 dotenv_1.default.config();
 exports.userRouter = (0, express_1.Router)({ strict: true });
-// api/auth/registration
-exports.userRouter.post('/registration', [
+// api/users/auth
+exports.userRouter.post('/auth', [
     (0, express_validator_1.check)('login', 'Login can\'t be empty').notEmpty(),
     (0, express_validator_1.check)('password', 'Password has to be at least 2 chars long').isLength({ min: 2 }),
 ], function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
@@ -69,7 +69,7 @@ exports.userRouter.post('/registration', [
             case 1:
                 _b.trys.push([1, 4, , 5]);
                 _a = req.body, login = _a.login, password = _a.password, name_1 = _a.name;
-                return [4 /*yield*/, models_1.User.findOne({ login: login })];
+                return [4 /*yield*/, models_1.User.exists({ login: login })];
             case 2:
                 user = _b.sent();
                 if (user) {
@@ -92,7 +92,7 @@ exports.userRouter.post('/registration', [
         }
     });
 }); });
-// api/auth/login
+// api/users/login
 exports.userRouter.post('/login', [
     (0, express_validator_1.check)('login', 'Login can\'t be empty').notEmpty(),
     (0, express_validator_1.check)('password', 'Password can\'t be empty').notEmpty(),
@@ -131,22 +131,20 @@ exports.userRouter.post('/login', [
                 }
                 (0, generateToken_1.default)(res, user._id);
                 delete user.password;
-                user.password = '';
                 res.status(200).json({ message: 'You successfully logged in', user: user });
                 return [3 /*break*/, 6];
             case 5:
                 error_2 = _c.sent();
-                console.log('from userRouter', error_2.message);
                 res.status(500).json({
                     message: 'Database error',
-                    stack: error_2.stackTrace
+                    stack: error_2.message
                 });
                 return [3 /*break*/, 6];
             case 6: return [2 /*return*/];
         }
     });
 }); });
-// api/auth/logout
+// api/users/logout
 exports.userRouter.post('/logout', function (req, res) {
     if (req.cookies.jwt) {
         res.cookie('jwt', '', {
@@ -160,12 +158,12 @@ exports.userRouter.post('/logout', function (req, res) {
         res.status(200).json({ message: 'You are already logged out' });
     }
 });
-// api/auth/get
-exports.userRouter.get('/get', authMiddleware_1.protect, function (req, res) {
-    res.status(200).json(req.body.user || {});
+// api/users/get
+exports.userRouter.get('/get', authMiddleware_1.verifyUser, function (req, res) {
+    res.status(200).json(req.body.user);
 });
-// api/auth/update
-exports.userRouter.put('/update', authMiddleware_1.protect, function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
+// api/users/update
+exports.userRouter.put('/update', authMiddleware_1.verifyUser, function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
     var _a, user, newUser, _b, _c, _d, _e, updatedUser, error_3;
     return __generator(this, function (_f) {
         switch (_f.label) {
@@ -202,13 +200,13 @@ exports.userRouter.put('/update', authMiddleware_1.protect, function (req, res) 
                 error_3 = _f.sent();
                 return [2 /*return*/, res.status(500).json({
                         message: "Database problems",
-                        stack: error_3.stackTrace
+                        stack: error_3.message
                     })];
             case 7: return [2 /*return*/];
         }
     });
 }); });
-// api/auth/delete_all
+// api/users/delete_all
 exports.userRouter.delete('/delete_all', function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
     var error_4;
     return __generator(this, function (_a) {
@@ -222,17 +220,16 @@ exports.userRouter.delete('/delete_all', function (req, res) { return __awaiter(
                 return [3 /*break*/, 3];
             case 2:
                 error_4 = _a.sent();
-                console.log('from userRouter', error_4.message);
                 res.status(500).json({
                     message: 'Database error',
-                    stack: error_4.stackTrace
+                    stack: error_4.message
                 });
                 return [3 /*break*/, 3];
             case 3: return [2 /*return*/];
         }
     });
 }); });
-// api/auth/get_all
+// api/users/get_all
 exports.userRouter.get('/get_all', function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
     var users, error_5;
     return __generator(this, function (_a) {
@@ -246,10 +243,9 @@ exports.userRouter.get('/get_all', function (req, res) { return __awaiter(void 0
                 return [3 /*break*/, 3];
             case 2:
                 error_5 = _a.sent();
-                console.log('from userRouter', error_5.message);
                 res.status(500).json({
                     message: 'Database error',
-                    stack: error_5.stackTrace
+                    stack: error_5.message
                 });
                 return [3 /*break*/, 3];
             case 3: return [2 /*return*/];

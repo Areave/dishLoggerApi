@@ -6,24 +6,24 @@ import {User} from '../../dataBase/models'
 
 dotenv.config();
 
-export const protect = asyncHandler(async (req, res, next) => {
+export const verifyUser = asyncHandler(async (req, res, next) => {
 
     const rawToken = req.cookies.jwt;
     if (rawToken) {
         try {
             const decoded = jwt.verify(rawToken, process.env.jwtKey);
-            // @ts-ignore
-            req.body.user = await User.findById(decoded.userId).select('-password');
-            next();
+            const user = await User.findById(decoded.userId).select('-password');
+            if (!user) {
+                res.status(401).json({message: 'No such user'});
+            } else {
+                req.body.user = user;
+                next();
+            }
         } catch (error) {
-            res.status(401);
-            throw new Error('Not authorized, invalid token');
+            res.status(401).json({message: 'Not authorized, invalid token', stack: error.message});
         }
-
     } else {
-        // res.status(401).json({message: 'no token'});
-        res.status(401);
-        throw new Error('Not authorized, no token');
+        res.status(401).json({message: 'Not authorized, no token'});
     }
 });
 
