@@ -47,7 +47,6 @@ var dbConnect = function (uri) { return __awaiter(void 0, void 0, void 0, functi
         switch (_a.label) {
             case 0:
                 _a.trys.push([0, 2, , 3]);
-                console.log(uri);
                 return [4 /*yield*/, mongoose_1.default.connect(uri)];
             case 1:
                 connect = _a.sent();

@@ -130,7 +130,7 @@ exports.userRouter.post('/login', [
                     return [2 /*return*/, res.status(400).json({ message: 'No such a user' })];
                 }
                 (0, generateToken_1.default)(res, user._id);
-                delete user.password;
+                user.password = '';
                 res.status(200).json({ message: 'You successfully logged in', user: user });
                 return [3 /*break*/, 6];
             case 5:
@@ -162,9 +162,32 @@ exports.userRouter.post('/logout', function (req, res) {
 exports.userRouter.get('/get', authMiddleware_1.verifyUser, function (req, res) {
     res.status(200).json(req.body.user);
 });
+// api/users/get_all
+exports.userRouter.get('/get_all', function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
+    var users, error_3;
+    return __generator(this, function (_a) {
+        switch (_a.label) {
+            case 0:
+                _a.trys.push([0, 2, , 3]);
+                return [4 /*yield*/, models_1.User.find().select('-password')];
+            case 1:
+                users = _a.sent();
+                res.status(200).json(users);
+                return [3 /*break*/, 3];
+            case 2:
+                error_3 = _a.sent();
+                res.status(500).json({
+                    message: 'Database error',
+                    stack: error_3.message
+                });
+                return [3 /*break*/, 3];
+            case 3: return [2 /*return*/];
+        }
+    });
+}); });
 // api/users/update
 exports.userRouter.put('/update', authMiddleware_1.verifyUser, function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
-    var _a, user, newUser, _b, _c, _d, _e, updatedUser, error_3;
+    var _a, user, newUser, _b, _c, _d, _e, updatedUser, error_4;
     return __generator(this, function (_f) {
         switch (_f.label) {
             case 0:
@@ -197,10 +220,10 @@ exports.userRouter.put('/update', authMiddleware_1.verifyUser, function (req, re
                 res.status(201).json(updatedUser);
                 return [3 /*break*/, 7];
             case 6:
-                error_3 = _f.sent();
+                error_4 = _f.sent();
                 return [2 /*return*/, res.status(500).json({
                         message: "Database problems",
-                        stack: error_3.message
+                        stack: error_4.message
                     })];
             case 7: return [2 /*return*/];
         }
@@ -208,7 +231,7 @@ exports.userRouter.put('/update', authMiddleware_1.verifyUser, function (req, re
 }); });
 // api/users/delete_all
 exports.userRouter.delete('/delete_all', function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
-    var error_4;
+    var error_5;
     return __generator(this, function (_a) {
         switch (_a.label) {
             case 0:
@@ -217,29 +240,6 @@ exports.userRouter.delete('/delete_all', function (req, res) { return __awaiter(
             case 1:
                 _a.sent();
                 res.status(200).json({ message: 'Users was deleted' });
-                return [3 /*break*/, 3];
-            case 2:
-                error_4 = _a.sent();
-                res.status(500).json({
-                    message: 'Database error',
-                    stack: error_4.message
-                });
-                return [3 /*break*/, 3];
-            case 3: return [2 /*return*/];
-        }
-    });
-}); });
-// api/users/get_all
-exports.userRouter.get('/get_all', function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
-    var users, error_5;
-    return __generator(this, function (_a) {
-        switch (_a.label) {
-            case 0:
-                _a.trys.push([0, 2, , 3]);
-                return [4 /*yield*/, models_1.User.find()];
-            case 1:
-                users = _a.sent();
-                res.status(200).json(users);
                 return [3 /*break*/, 3];
             case 2:
                 error_5 = _a.sent();

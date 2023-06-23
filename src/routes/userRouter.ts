@@ -65,7 +65,7 @@ userRouter.post('/login', [
             return res.status(400).json({message: 'No such a user'});
         }
         generateToken(res, user._id);
-        delete user.password;
+        user.password = '';
         res.status(200).json({message: 'You successfully logged in', user});
     } catch (error) {
         res.status(500).json({
@@ -92,6 +92,19 @@ userRouter.post('/logout', (req: Request, res: Response) => {
 // api/users/get
 userRouter.get('/get', verifyUser, (req: Request, res: Response) => {
     res.status(200).json(req.body.user);
+});
+
+// api/users/get_all
+userRouter.get('/get_all', async (req: Request, res: Response) => {
+    try {
+        const users = await User.find().select('-password');
+        res.status(200).json(users);
+    } catch (error) {
+        res.status(500).json({
+            message: 'Database error',
+            stack: error.message
+        });
+    }
 });
 
 // api/users/update
@@ -126,19 +139,6 @@ userRouter.delete('/delete_all', async (req: Request, res: Response) => {
     try {
         await User.deleteMany({});
         res.status(200).json({message: 'Users was deleted'});
-    } catch (error) {
-        res.status(500).json({
-            message: 'Database error',
-            stack: error.message
-        });
-    }
-});
-
-// api/users/get_all
-userRouter.get('/get_all', async (req: Request, res: Response) => {
-    try {
-        const users = await User.find();
-        res.status(200).json(users);
     } catch (error) {
         res.status(500).json({
             message: 'Database error',
