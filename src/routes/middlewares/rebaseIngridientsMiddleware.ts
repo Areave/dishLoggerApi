@@ -4,10 +4,16 @@ export const rebaseIngridientsMiddleware = asyncHandler(async (req, res, next) =
 
     // console.log('req.body.dish', req.body.dish);
 
-    if (!req.body.dish) {
-        res.status(400).json({message: "Dish is null"})
+    let key;
+    if (req.body.dish) {
+        key = 'dish';
+    } else if (req.body.meal) {
+        key = 'meal'
+    } else {
+        res.status(400).json({message: "No data was sended"})
     }
-    if (!req.body.dish.ingridients) {
+
+    if (!req.body[key].ingridients) {
         return next();
     }
 
@@ -17,7 +23,7 @@ export const rebaseIngridientsMiddleware = asyncHandler(async (req, res, next) =
             type: string,
         },
         amount: number
-    }] = req.body.dish.ingridients;
+    }] = req.body[key].ingridients;
 
     let ingridientsIds = {};
     let ingridientsAmount = {};
@@ -48,8 +54,8 @@ export const rebaseIngridientsMiddleware = asyncHandler(async (req, res, next) =
         }
     });
 
-    req.body.dish.ingridientsIds = ingridientsIds;
-    req.body.dish.ingridientsAmount = ingridientsAmount;
-    req.body.dish.owner = req.body.user._id;
+    req.body[key].ingridientsIds = ingridientsIds;
+    req.body[key].ingridientsAmount = ingridientsAmount;
+    req.body[key].owner = req.body.user._id;
     next();
 });

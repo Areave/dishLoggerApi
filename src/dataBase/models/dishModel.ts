@@ -17,6 +17,9 @@ const dishSchema = new Schema({
         require: true,
         ref: 'User'
     },
+    price: {
+        type: Object
+    },
     ingridientsIds: {
         products: [{
             type: Types.ObjectId,
@@ -27,9 +30,6 @@ const dishSchema = new Schema({
         products: Array
     },
     ingridients: Array,
-    price: {
-        type: Object
-    },
     energyValue: {
         type: Object,
     },

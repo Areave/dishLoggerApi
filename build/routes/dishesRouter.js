@@ -74,7 +74,6 @@ var updateUserDishes = function (res, userId, dishes) { return __awaiter(void 0,
                 _a.trys.push([0, 2, , 3]);
                 return [4 /*yield*/, Promise.all([
                         models_1.User.updateOne({ _id: userId }, { dishes: dishes }),
-                        // Dish.find({owner: userId}).populate({path: 'ingridientsIds', populate: 'products'})
                         models_1.Dish.find({ owner: userId }).populate('ingridientsIds.products')
                     ])];
             case 1:
@@ -105,7 +104,6 @@ exports.dishesRouter.post('/add', rebaseIngridientsMiddleware_1.rebaseIngridient
                             message: "Duplicate name: " + dish.name
                         })];
                 }
-                console.log('/add');
                 return [4 /*yield*/, models_1.Dish.create(__assign({}, dish))];
             case 2:
                 newItem = _b.sent();
@@ -131,7 +129,7 @@ exports.dishesRouter.get('/dish/:id', function (req, res) { return __awaiter(voi
                             stack: error.stackTrace
                         })];
                 }
-                return [4 /*yield*/, models_1.Dish.findOne({ owner: user._id, _id: objectId })];
+                return [4 /*yield*/, models_1.Dish.findOne({ owner: user._id, _id: objectId }).populate('ingridientsIds.products')];
             case 1:
                 dish = _a.sent();
                 if (!dish) {

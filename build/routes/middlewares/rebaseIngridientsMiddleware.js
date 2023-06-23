@@ -42,16 +42,21 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.rebaseIngridientsMiddleware = void 0;
 var express_async_handler_1 = __importDefault(require("express-async-handler"));
 exports.rebaseIngridientsMiddleware = (0, express_async_handler_1.default)(function (req, res, next) { return __awaiter(void 0, void 0, void 0, function () {
-    var ingridients, ingridientsIds, ingridientsAmount;
+    var key, ingridients, ingridientsIds, ingridientsAmount;
     return __generator(this, function (_a) {
-        // console.log('req.body.dish', req.body.dish);
-        if (!req.body.dish) {
-            res.status(400).json({ message: "Dish is null" });
+        if (req.body.dish) {
+            key = 'dish';
         }
-        if (!req.body.dish.ingridients) {
+        else if (req.body.meal) {
+            key = 'meal';
+        }
+        else {
+            res.status(400).json({ message: "No data was sended" });
+        }
+        if (!req.body[key].ingridients) {
             return [2 /*return*/, next()];
         }
-        ingridients = req.body.dish.ingridients;
+        ingridients = req.body[key].ingridients;
         ingridientsIds = {};
         ingridientsAmount = {};
         ingridients.forEach(function (ingridientObject) {
@@ -78,9 +83,9 @@ exports.rebaseIngridientsMiddleware = (0, express_async_handler_1.default)(funct
                 ingridientsAmount[field] = [ingridientObject.amount];
             }
         });
-        req.body.dish.ingridientsIds = ingridientsIds;
-        req.body.dish.ingridientsAmount = ingridientsAmount;
-        req.body.dish.owner = req.body.user._id;
+        req.body[key].ingridientsIds = ingridientsIds;
+        req.body[key].ingridientsAmount = ingridientsAmount;
+        req.body[key].owner = req.body.user._id;
         next();
         return [2 /*return*/];
     });

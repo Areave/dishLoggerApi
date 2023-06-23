@@ -17,29 +17,24 @@ var mealSchema = new mongoose_1.Schema({
         require: true,
         ref: 'User'
     },
-    dishes: [{
-            type: mongoose_1.Types.ObjectId,
-            ref: 'Dish'
-        }],
-    products: [{
-            type: mongoose_1.Types.ObjectId,
-            ref: 'Product'
-        }],
-    ingridients: {
-        type: {
-            dishes: [{
-                    type: mongoose_1.Types.ObjectId,
-                    ref: 'Dish'
-                }],
-            products: [{
-                    type: mongoose_1.Types.ObjectId,
-                    ref: 'Product'
-                }],
-        }
-    },
     price: {
         type: Object
     },
+    ingridientsIds: {
+        products: [{
+                type: mongoose_1.Types.ObjectId,
+                ref: 'Product'
+            }],
+        dishes: [{
+                type: mongoose_1.Types.ObjectId,
+                ref: 'Dish'
+            }],
+    },
+    ingridientsAmount: {
+        products: Array,
+        dishes: Array,
+    },
+    ingridients: Array,
     energyValue: {
         type: Object,
     },

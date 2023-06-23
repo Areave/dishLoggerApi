@@ -48,7 +48,7 @@ dishesRouter.get('/dish/:id', async (req: Request, res: Response): Promise<Respo
             stack: error.stackTrace
         });
     }
-    let dish = await Dish.findOne({owner: user._id, _id: objectId});
+    let dish = await Dish.findOne({owner: user._id, _id: objectId}).populate('ingridientsIds.products');
     if (!dish) {
         return res.status(400).json({
             message: "No such dish"

@@ -17,6 +17,9 @@ var dishSchema = new mongoose_1.Schema({
         require: true,
         ref: 'User'
     },
+    price: {
+        type: Object
+    },
     ingridientsIds: {
         products: [{
                 type: mongoose_1.Types.ObjectId,
@@ -27,9 +30,6 @@ var dishSchema = new mongoose_1.Schema({
         products: Array
     },
     ingridients: Array,
-    price: {
-        type: Object
-    },
     energyValue: {
         type: Object,
     },

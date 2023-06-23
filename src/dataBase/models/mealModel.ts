@@ -17,29 +17,24 @@ const mealSchema = new Schema({
         require: true,
         ref: 'User'
     },
-    dishes: [{
-        type: Types.ObjectId,
-        ref: 'Dish'
-    }],
-    products: [{
-        type: Types.ObjectId,
-        ref: 'Product'
-        }],
-    ingridients: {
-        type: {
-            dishes: [{
-                type: Types.ObjectId,
-                ref: 'Dish'
-            }],
-            products: [{
-                type: Types.ObjectId,
-                ref: 'Product'
-            }],
-        }
-    },
     price: {
         type: Object
     },
+    ingridientsIds: {
+        products: [{
+            type: Types.ObjectId,
+            ref: 'Product'
+        }],
+        dishes: [{
+            type: Types.ObjectId,
+            ref: 'Dish'
+        }],
+    },
+    ingridientsAmount: {
+        products: Array,
+        dishes: Array,
+    },
+    ingridients: Array,
     energyValue: {
         type: Object,
     },
