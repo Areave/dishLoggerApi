@@ -63,30 +63,8 @@ exports.dishesRouter = void 0;
 var express_1 = require("express");
 var models_1 = require("./../dataBase/models");
 var generateObjectId_1 = __importDefault(require("../utils/generateObjectId"));
+var updateUsersItems_1 = __importDefault(require("../utils/updateUsersItems"));
 exports.dishesRouter = (0, express_1.Router)({ strict: true });
-var updateUserDishes = function (res, userId, dishes) { return __awaiter(void 0, void 0, void 0, function () {
-    var promiseAllArray, error_1;
-    return __generator(this, function (_a) {
-        switch (_a.label) {
-            case 0:
-                _a.trys.push([0, 2, , 3]);
-                return [4 /*yield*/, Promise.all([
-                        models_1.User.updateOne({ _id: userId }, { dishes: dishes }),
-                        models_1.Dish.find({ owner: userId }).select('-owner')
-                    ])];
-            case 1:
-                promiseAllArray = _a.sent();
-                return [2 /*return*/, res.status(201).json(promiseAllArray[1])];
-            case 2:
-                error_1 = _a.sent();
-                return [2 /*return*/, res.status(500).json({
-                        message: "Database problems",
-                        stack: error_1.message
-                    })];
-            case 3: return [2 /*return*/];
-        }
-    });
-}); };
 // api/dishes/add
 exports.dishesRouter.post('/add', function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
     var _a, user, dish, newItem;
@@ -105,7 +83,7 @@ exports.dishesRouter.post('/add', function (req, res) { return __awaiter(void 0,
                 return [4 /*yield*/, models_1.Dish.create(__assign({}, dish))];
             case 2:
                 newItem = _b.sent();
-                return [4 /*yield*/, updateUserDishes(res, user._id, __spreadArray(__spreadArray([], user.dishes, true), [newItem._id], false))];
+                return [4 /*yield*/, (0, updateUsersItems_1.default)(res, user._id, __spreadArray(__spreadArray([], user.dishes, true), [newItem._id], false), models_1.Dish)];
             case 3: return [2 /*return*/, _b.sent()];
         }
     });
@@ -183,7 +161,7 @@ exports.dishesRouter.delete('/remove', function (req, res) { return __awaiter(vo
                 dishes = user.dishes.filter(function (dish) {
                     return dish._id != dishId;
                 });
-                return [4 /*yield*/, updateUserDishes(res, user._id, dishes)];
+                return [4 /*yield*/, (0, updateUsersItems_1.default)(res, user._id, dishes, models_1.Dish)];
             case 2: return [2 /*return*/, _b.sent()];
         }
     });
@@ -199,7 +177,7 @@ exports.dishesRouter.delete('/remove_all', function (req, res) { return __awaite
             case 1:
                 _a.sent();
                 dishes = [];
-                return [4 /*yield*/, updateUserDishes(res, user._id, dishes)];
+                return [4 /*yield*/, (0, updateUsersItems_1.default)(res, user._id, dishes, models_1.Dish)];
             case 2: return [2 /*return*/, _a.sent()];
         }
     });

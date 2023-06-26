@@ -1,24 +1,9 @@
 import {Router, Request, Response} from 'express';
 import {User, Dish} from './../dataBase/models';
 import generateObjectId from "../utils/generateObjectId";
+import updateUsersItems from "../utils/updateUsersItems";
 
 export const dishesRouter = Router({strict: true});
-
-const updateUserDishes = async (res, userId, dishes) => {
-    try {
-        const promiseAllArray = await Promise.all([
-            User.updateOne({_id: userId}, {dishes}),
-            Dish.find({owner: userId}).select('-owner')
-        ]);
-        return res.status(201).json(promiseAllArray[1]);
-
-    } catch (error) {
-        return res.status(500).json({
-            message: "Database problems",
-            stack: error.message
-        });
-    }
-};
 
 // api/dishes/add
 dishesRouter.post('/add', async (req: Request, res: Response): Promise<Response> => {
@@ -30,7 +15,7 @@ dishesRouter.post('/add', async (req: Request, res: Response): Promise<Response>
     }
     dish.owner = user._id;
     const newItem = await Dish.create({...dish});
-    return await updateUserDishes(res, user._id, [...user.dishes, newItem._id]);
+    return await updateUsersItems(res, user._id, [...user.dishes, newItem._id], Dish);
 });
 
 // api/dishes/dish/:id
@@ -76,7 +61,7 @@ dishesRouter.delete('/remove', async (req: Request, res: Response): Promise<Resp
     const dishes = user.dishes.filter(dish => {
         return dish._id != dishId;
     });
-    return await updateUserDishes(res, user._id, dishes);
+    return await updateUsersItems(res, user._id, dishes, Dish);
 });
 
 // api/dishes/remove_all
@@ -84,5 +69,5 @@ dishesRouter.delete('/remove_all', async (req: Request, res: Response): Promise<
     const {user} = req.body;
     await Dish.deleteMany({owner: user._id});
     const dishes = [];
-    return await updateUserDishes(res, user._id, dishes);
+    return await updateUsersItems(res, user._id, dishes, Dish);
 });
