@@ -7,11 +7,10 @@ const productSchema = new Schema({
         required: true,
     },
     type: {
-        type: String
-    },
-    description: {
         type: String,
+        required: true,
     },
+    description: String,
     owner: {
         type: Types.ObjectId,
         require: true,
@@ -21,10 +20,14 @@ const productSchema = new Schema({
         type: Number,
     },
     price: {
-        type: Object
+        priceForPiece: Number,
+        priceFor100g: Number
     },
     energyValueFor100g: {
-        type: Object,
+        calories: Number,
+        proteines: Number,
+        fats: Number,
+        carbohydrates: Number
     },
 });
 

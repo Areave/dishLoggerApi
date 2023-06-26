@@ -6,11 +6,10 @@ var productSchema = new mongoose_1.Schema({
         required: true,
     },
     type: {
-        type: String
-    },
-    description: {
         type: String,
+        required: true,
     },
+    description: String,
     owner: {
         type: mongoose_1.Types.ObjectId,
         require: true,
@@ -20,10 +19,14 @@ var productSchema = new mongoose_1.Schema({
         type: Number,
     },
     price: {
-        type: Object
+        priceForPiece: Number,
+        priceFor100g: Number
     },
     energyValueFor100g: {
-        type: Object,
+        calories: Number,
+        proteines: Number,
+        fats: Number,
+        carbohydrates: Number
     },
 });
 module.exports = (0, mongoose_1.model)('Product', productSchema);
