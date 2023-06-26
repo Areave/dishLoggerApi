@@ -7,67 +7,34 @@ const dishSchema = new Schema({
         unique: true
     },
     type: {
-        type: String
-    },
-    description: {
         type: String,
+        required: true
     },
+    description: String,
     owner: {
         type: Types.ObjectId,
         require: true,
         ref: 'User'
     },
-    price: {
-        type: Object
-    },
-    ingridientsIds: {
-        products: [{
-            type: Types.ObjectId,
-            ref: 'Product'
-        }]
-    },
-    ingridientsAmount: {
-        products: Array
-    },
-    ingridients: Array,
+    ingridients: [{
+        ingridient: Object,
+        weight: Number,
+        price: Number,
+        energyValue: {
+            calories: Number,
+            proteines: Number,
+            fats: Number,
+            carbohydrates: Number
+        }
+    }],
+    weight: Number,
+    price: Number,
     energyValue: {
-        type: Object,
-    },
+        calories: Number,
+        proteines: Number,
+        fats: Number,
+        carbohydrates: Number
+    }
 });
-
-
-// dishSchema.post('populate', function (doc, next){
-//
-//     console.log('postfind start, doc', doc);
-//
-//     doc.forEach( docItem => {
-//
-//         // @ts-ignore
-//         const ingridientsIds = docItem.ingridientsIds;
-//         // @ts-ignore
-//         const ingridientsAmount = docItem.ingridientsAmount;
-//         const ingridients = [];
-//
-//         ingridientsIds.products.forEach((ingridientObject, index) => {
-//             ingridients.push({ingridient: ingridientObject, amount: ingridientsAmount.products[index]})
-//         });
-//
-//         console.log('ingridients',ingridients);
-//
-//
-//         docItem.ingridientsIds = '';
-//         docItem.ingridientsAmount = '';
-//         // @ts-ignore
-//         docItem.ingridients = ingridients;
-//
-//         console.log("docItem", docItem);
-//
-//
-//     });
-//
-//     console.log('postfind end, doc', doc);
-//     next();
-//
-// });
 
 export = model('Dish', dishSchema);

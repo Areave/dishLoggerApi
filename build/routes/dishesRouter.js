@@ -62,24 +62,21 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.dishesRouter = void 0;
 var express_1 = require("express");
 var models_1 = require("./../dataBase/models");
-var rebaseIngridientsMiddleware_1 = require("./middlewares/rebaseIngridientsMiddleware");
 var generateObjectId_1 = __importDefault(require("../utils/generateObjectId"));
-var rebaseIngridients_1 = __importDefault(require("../utils/rebaseIngridients"));
 exports.dishesRouter = (0, express_1.Router)({ strict: true });
 var updateUserDishes = function (res, userId, dishes) { return __awaiter(void 0, void 0, void 0, function () {
-    var promiseAllArray, updatedDishesArray, error_1;
+    var promiseAllArray, error_1;
     return __generator(this, function (_a) {
         switch (_a.label) {
             case 0:
                 _a.trys.push([0, 2, , 3]);
                 return [4 /*yield*/, Promise.all([
                         models_1.User.updateOne({ _id: userId }, { dishes: dishes }),
-                        models_1.Dish.find({ owner: userId }).populate('ingridientsIds.products')
+                        models_1.Dish.find({ owner: userId }).select('-owner')
                     ])];
             case 1:
                 promiseAllArray = _a.sent();
-                updatedDishesArray = (0, rebaseIngridients_1.default)(promiseAllArray[1]);
-                return [2 /*return*/, res.status(201).json(updatedDishesArray)];
+                return [2 /*return*/, res.status(201).json(promiseAllArray[1])];
             case 2:
                 error_1 = _a.sent();
                 return [2 /*return*/, res.status(500).json({
@@ -91,8 +88,8 @@ var updateUserDishes = function (res, userId, dishes) { return __awaiter(void 0,
     });
 }); };
 // api/dishes/add
-exports.dishesRouter.post('/add', rebaseIngridientsMiddleware_1.rebaseIngridientsMiddleware, function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
-    var _a, user, dish, newItem, dishes;
+exports.dishesRouter.post('/add', function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
+    var _a, user, dish, newItem;
     return __generator(this, function (_b) {
         switch (_b.label) {
             case 0:
@@ -104,11 +101,11 @@ exports.dishesRouter.post('/add', rebaseIngridientsMiddleware_1.rebaseIngridient
                             message: "Duplicate name: " + dish.name
                         })];
                 }
+                dish.owner = user._id;
                 return [4 /*yield*/, models_1.Dish.create(__assign({}, dish))];
             case 2:
                 newItem = _b.sent();
-                dishes = __spreadArray(__spreadArray([], user.dishes, true), [newItem._id], false);
-                return [4 /*yield*/, updateUserDishes(res, user._id, dishes)];
+                return [4 /*yield*/, updateUserDishes(res, user._id, __spreadArray(__spreadArray([], user.dishes, true), [newItem._id], false))];
             case 3: return [2 /*return*/, _b.sent()];
         }
     });
@@ -129,7 +126,7 @@ exports.dishesRouter.get('/dish/:id', function (req, res) { return __awaiter(voi
                             stack: error.stackTrace
                         })];
                 }
-                return [4 /*yield*/, models_1.Dish.findOne({ owner: user._id, _id: objectId }).populate('ingridientsIds.products')];
+                return [4 /*yield*/, models_1.Dish.findOne({ owner: user._id, _id: objectId }).select('-owner')];
             case 1:
                 dish = _a.sent();
                 if (!dish) {
@@ -137,7 +134,6 @@ exports.dishesRouter.get('/dish/:id', function (req, res) { return __awaiter(voi
                             message: "No such dish"
                         })];
                 }
-                dish = (0, rebaseIngridients_1.default)([dish])[0];
                 res.status(201).json(dish);
                 return [2 /*return*/];
         }
@@ -150,7 +146,7 @@ exports.dishesRouter.get('/get_all', function (req, res) { return __awaiter(void
         switch (_a.label) {
             case 0:
                 user = req.body.user;
-                return [4 /*yield*/, models_1.Dish.find({ owner: user._id })];
+                return [4 /*yield*/, models_1.Dish.find({ owner: user._id }).select('-owner')];
             case 1:
                 userDishes = _a.sent();
                 return [2 /*return*/, res.status(200).json(userDishes)];
@@ -158,13 +154,12 @@ exports.dishesRouter.get('/get_all', function (req, res) { return __awaiter(void
     });
 }); });
 // api/dishes/update
-exports.dishesRouter.put('/update', rebaseIngridientsMiddleware_1.rebaseIngridientsMiddleware, function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
+exports.dishesRouter.put('/update', function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
     var _a, user, dish, dishes;
     return __generator(this, function (_b) {
         switch (_b.label) {
             case 0:
                 _a = req.body, user = _a.user, dish = _a.dish;
-                dish.owner = user._id;
                 return [4 /*yield*/, models_1.Dish.updateOne({ _id: dish._id }, __assign({}, dish))];
             case 1:
                 _b.sent();
@@ -177,21 +172,12 @@ exports.dishesRouter.put('/update', rebaseIngridientsMiddleware_1.rebaseIngridie
 }); });
 // api/dishes/remove
 exports.dishesRouter.delete('/remove', function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
-    var _a, user, dishId, objectId, dishes;
+    var _a, user, dishId, dishes;
     return __generator(this, function (_b) {
         switch (_b.label) {
             case 0:
                 _a = req.body, user = _a.user, dishId = _a.dishId;
-                try {
-                    objectId = (0, generateObjectId_1.default)(dishId);
-                }
-                catch (error) {
-                    return [2 /*return*/, res.status(400).json({
-                            message: 'Bad ID link',
-                            stack: error.stackTrace
-                        })];
-                }
-                return [4 /*yield*/, models_1.Dish.deleteOne({ _id: objectId })];
+                return [4 /*yield*/, models_1.Dish.deleteOne({ _id: dishId })];
             case 1:
                 _b.sent();
                 dishes = user.dishes.filter(function (dish) {
