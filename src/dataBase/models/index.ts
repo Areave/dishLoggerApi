@@ -2,7 +2,7 @@ import User from "./userModel";
 import Product from "./productModel";
 import Dish from "./dishModel";
 import Meal from "./mealModel";
-// import Stats from "./statsModel";
+import Stat from "./statsModel";
 
 
 export {
@@ -10,5 +10,5 @@ export {
     Product,
     Dish,
     Meal,
-    // Stats,
+    Stat,
 }

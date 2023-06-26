@@ -13,6 +13,7 @@ const statsSchema = new Schema({
     amountOfNotGuessings: {
         type: Number
     },
+
     ratioOfGuessings: {
         type: Number
     },
@@ -26,4 +27,4 @@ const statsSchema = new Schema({
     }
 });
 
-export = model('Stats', statsSchema);
+export = model('Stat', statsSchema);
