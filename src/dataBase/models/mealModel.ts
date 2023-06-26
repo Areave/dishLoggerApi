@@ -7,37 +7,34 @@ const mealSchema = new Schema({
         unique: true
     },
     type: {
-        type: String
-    },
-    description: {
         type: String,
+        required: true
     },
+    description: String,
     owner: {
         type: Types.ObjectId,
         require: true,
         ref: 'User'
     },
-    price: {
-        type: Object
-    },
-    ingridientsIds: {
-        products: [{
-            type: Types.ObjectId,
-            ref: 'Product'
-        }],
-        dishes: [{
-            type: Types.ObjectId,
-            ref: 'Dish'
-        }],
-    },
-    ingridientsAmount: {
-        products: Array,
-        dishes: Array,
-    },
-    ingridients: Array,
+    ingridients: [{
+        ingridient: Object,
+        weight: Number,
+        price: Number,
+        energyValue: {
+            calories: Number,
+            proteines: Number,
+            fats: Number,
+            carbohydrates: Number
+        }
+    }],
+    weight: Number,
+    price: Number,
     energyValue: {
-        type: Object,
-    },
+        calories: Number,
+        proteines: Number,
+        fats: Number,
+        carbohydrates: Number
+    }
 });
 
 export = model('Meal', mealSchema);
