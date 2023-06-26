@@ -35,64 +35,26 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
         if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
     }
 };
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
 Object.defineProperty(exports, "__esModule", { value: true });
-var express_1 = __importDefault(require("express"));
-var dotenv_1 = __importDefault(require("dotenv"));
-var cors_1 = __importDefault(require("cors"));
-// import './index.pug';
-var dbService_1 = require("./dataBase/dbService");
-var routes_1 = require("./routes");
-var cookie_parser_1 = __importDefault(require("cookie-parser"));
-var authMiddleware_1 = require("./routes/middlewares/authMiddleware");
-dotenv_1.default.config();
-var mongoUri = process.env.mongoUri;
-var port = process.env.PORT;
-var app = (0, express_1.default)();
-app.use((0, cookie_parser_1.default)());
-app.use(express_1.default.json());
-app.use((0, cors_1.default)());
-app.use(express_1.default.urlencoded({ extended: true }));
-// app.use('/users', usersRouter);
-// app.use('/words', wordsRouter);
-app.use('/api/users', routes_1.userRouter);
-app.use('/api/products', authMiddleware_1.verifyUser, routes_1.productRouter);
-app.use('/api/dishes', authMiddleware_1.verifyUser, routes_1.dishesRouter);
-app.use('/api/meals', authMiddleware_1.verifyUser, routes_1.mealsRouter);
-app.use('/api/stats', authMiddleware_1.verifyUser, routes_1.statsRouter);
-// app.use('/api/auth/registration', (req, res) => {
-//     res.send('auth endpoint');
-// });
-app.get('/', function (req, res) {
-    res.send('hey, its me');
-});
-// const compiledFunction = pug.compileFile('index.pug');
-// app.get('/', (request, response) => {
-//     response.send(pug.compileFile('./index.pug')({
-//         name: 'joe'
-//     }));
-// });
-var start = function () { return __awaiter(void 0, void 0, void 0, function () {
-    var e_1;
+exports.statsRouter = void 0;
+var express_1 = require("express");
+var rebaseIngridientsMiddleware_1 = require("./middlewares/rebaseIngridientsMiddleware");
+exports.statsRouter = (0, express_1.Router)({ strict: true });
+// api/stats/add
+exports.statsRouter.post('/set', rebaseIngridientsMiddleware_1.rebaseIngridientsMiddleware, function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
     return __generator(this, function (_a) {
-        switch (_a.label) {
-            case 0:
-                _a.trys.push([0, 2, , 3]);
-                return [4 /*yield*/, (0, dbService_1.dbConnect)(mongoUri)];
-            case 1:
-                _a.sent();
-                app.listen(port, function () { return console.log("Running on port ".concat(port)); });
-                return [3 /*break*/, 3];
-            case 2:
-                e_1 = _a.sent();
-                console.log('database connected error', e_1.message);
-                process.exit(1);
-                return [3 /*break*/, 3];
-            case 3: return [2 /*return*/];
-        }
+        return [2 /*return*/, res.status(200).send()];
     });
-}); };
-start();
-module.exports = app;
+}); });
+// api/stats/get_stat
+exports.statsRouter.post('/get_stat', function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
+    return __generator(this, function (_a) {
+        return [2 /*return*/, res.status(200).send()];
+    });
+}); });
+// api/stats/update_stat
+exports.statsRouter.post('/update_stat', function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
+    return __generator(this, function (_a) {
+        return [2 /*return*/, res.status(200).send()];
+    });
+}); });

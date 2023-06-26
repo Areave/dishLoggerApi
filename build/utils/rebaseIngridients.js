@@ -8,7 +8,6 @@ var rebaseIngridients = function (instanceArray) {
     if (!instanceArray.length) {
         return instanceArray;
     }
-    console.log('instanceArray[0]', instanceArray[0]);
     instanceArray.forEach(function (instance) {
         var ingridientsIds = instance.ingridientsIds;
         var ingridientsAmount = instance.ingridientsAmount;

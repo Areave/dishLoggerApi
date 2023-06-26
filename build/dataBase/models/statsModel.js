@@ -25,4 +25,4 @@ var statsSchema = new mongoose_1.Schema({
         ref: 'User'
     }
 });
-module.exports = (0, mongoose_1.model)('Stats', statsSchema);
+module.exports = (0, mongoose_1.model)('Stat', statsSchema);
