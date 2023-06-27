@@ -6,29 +6,26 @@ var statSchema = new mongoose_1.Schema({
         required: true,
         unique: true
     },
+    dateString: String,
     owner: {
         type: mongoose_1.Types.ObjectId,
         require: true,
         ref: 'User'
     },
+    meals: Array,
+    weight: Number,
     price: Number,
-    ingridientsIds: {
-        products: [{
-                type: mongoose_1.Types.ObjectId,
-                ref: 'Product'
-            }],
-        dishes: [{
-                type: mongoose_1.Types.ObjectId,
-                ref: 'Dish'
-            }],
-    },
-    ingridientsAmount: {
-        products: Array,
-        dishes: Array,
-    },
-    ingridients: Array,
     energyValue: {
-        type: Object,
+        calories: Number,
+        proteines: Number,
+        fats: Number,
+        carbohydrates: Number
     },
+    energyValueDifference: {
+        calories: Number,
+        proteines: Number,
+        fats: Number,
+        carbohydrates: Number
+    }
 });
 module.exports = (0, mongoose_1.model)('Stat', statSchema);

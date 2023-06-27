@@ -14,6 +14,8 @@ mealsRouter.post('/add', async (req: Request, res: Response): Promise<Response> 
         });
     }
     meal.owner = user._id;
+    const date = new Date();
+    meal.dateString = `${date.getDate()}.${date.getMonth()+1}.${date.getFullYear()}`;
     const newItem = await Meal.create({...meal});
     return await updateUsersItems(res, user._id, [...user.dishes, newItem._id], Meal);
 });

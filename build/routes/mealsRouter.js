@@ -67,7 +67,7 @@ var updateUsersItems_1 = __importDefault(require("../utils/updateUsersItems"));
 exports.mealsRouter = (0, express_1.Router)({ strict: true });
 // api/meals/add
 exports.mealsRouter.post('/add', function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
-    var _a, user, meal, newItem;
+    var _a, user, meal, date, newItem;
     return __generator(this, function (_b) {
         switch (_b.label) {
             case 0:
@@ -80,6 +80,8 @@ exports.mealsRouter.post('/add', function (req, res) { return __awaiter(void 0, 
                         })];
                 }
                 meal.owner = user._id;
+                date = new Date();
+                meal.dateString = "".concat(date.getDate(), ".").concat(date.getMonth() + 1, ".").concat(date.getFullYear());
                 return [4 /*yield*/, models_1.Meal.create(__assign({}, meal))];
             case 2:
                 newItem = _b.sent();

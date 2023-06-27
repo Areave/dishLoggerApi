@@ -38,23 +38,161 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.statsRouter = void 0;
 var express_1 = require("express");
-var rebaseIngridientsMiddleware_1 = require("./middlewares/rebaseIngridientsMiddleware");
+var models_1 = require("./../dataBase/models");
 exports.statsRouter = (0, express_1.Router)({ strict: true });
-// api/stats/add
-exports.statsRouter.post('/set', rebaseIngridientsMiddleware_1.rebaseIngridientsMiddleware, function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
+var getStatDifferences = function (intakeData, stat) {
+    var energyValueDifference = {
+        calories: 0,
+        proteines: 0,
+        fats: 0,
+        carbohydrates: 0
+    };
+    if (!intakeData) {
+        return energyValueDifference;
+    }
+    for (var key in energyValueDifference) {
+        energyValueDifference[key] = stat[key] - intakeData[key];
+    }
+    return energyValueDifference;
+};
+var mergeMealDataToMainStat = function (meal, mainStat) {
+    var newMainStat = {
+        weight: 0,
+        price: 0,
+        energyValue: {
+            calories: 0,
+            proteines: 0,
+            fats: 0,
+            carbohydrates: 0
+        }
+    };
+    newMainStat.weight = mainStat.weight + (meal.weight || 0);
+    newMainStat.price = mainStat.price + (meal.price || 0);
+    newMainStat.energyValue.calories = mainStat.energyValue.calories + (meal.energyValue.calories || 0);
+    newMainStat.energyValue.proteines = mainStat.energyValue.proteines + (meal.energyValue.proteines || 0);
+    newMainStat.energyValue.fats = mainStat.energyValue.fats + (meal.energyValue.fats || 0);
+    newMainStat.energyValue.carbohydrates = mainStat.energyValue.carbohydrates + (meal.energyValue.carbohydrates || 0);
+    return newMainStat;
+};
+var createDailyStatObjectFromMealsArray = function (intakeData, dailyMealsArray, key) {
+    var dailyStatObject = {
+        dateString: key,
+        meals: [],
+        weight: 0,
+        price: 0,
+        energyValue: {
+            calories: 0,
+            proteines: 0,
+            fats: 0,
+            carbohydrates: 0
+        },
+        energyValueDifference: {
+            calories: 0,
+            proteines: 0,
+            fats: 0,
+            carbohydrates: 0
+        }
+    };
+    console.log('dailyMealsArray', dailyMealsArray);
+    for (var i = 0; i < dailyMealsArray.length; i++) {
+        var _a = dailyMealsArray[i], _id = _a._id, weight = _a.weight, price = _a.price, name_1 = _a.name, energyValue = _a.energyValue;
+        dailyStatObject.meals.push({ _id: _id, name: name_1, weight: weight, price: price, energyValue: energyValue });
+        dailyStatObject.weight += weight;
+        dailyStatObject.price += price;
+        dailyStatObject.energyValue.calories += energyValue.calories;
+        dailyStatObject.energyValue.proteines += energyValue.proteines;
+        dailyStatObject.energyValue.fats += energyValue.fats;
+        dailyStatObject.energyValue.carbohydrates += energyValue.carbohydrates;
+    }
+    console.log('dailyStatObject', dailyStatObject);
+    dailyStatObject.energyValueDifference = getStatDifferences(intakeData, dailyStatObject.energyValue);
+    return dailyStatObject;
+};
+var createStatFromMealsArray = function (intakeData, mealsArray) {
+    var statObject = {
+        mainStat: {
+            weight: 0,
+            price: 0,
+            energyValue: {
+                calories: 0,
+                proteines: 0,
+                fats: 0,
+                carbohydrates: 0
+            }
+        },
+        statArray: []
+    };
+    if (!mealsArray.length) {
+        return statObject;
+    }
+    var tempObjectDateKey = {};
+    // fill tempObjectDateKey
+    for (var key in mealsArray) {
+        var currentMeal = mealsArray[key];
+        //fill mainStat
+        statObject.mainStat = mergeMealDataToMainStat(currentMeal, statObject.mainStat);
+        var dateStringKey = currentMeal.dateString;
+        if (!tempObjectDateKey[dateStringKey]) {
+            tempObjectDateKey[dateStringKey] = [currentMeal];
+        }
+        else {
+            tempObjectDateKey[dateStringKey].push(currentMeal);
+        }
+    }
+    console.log('tempObjectDateKey', tempObjectDateKey);
+    for (var key in tempObjectDateKey) {
+        var dailyMealsArray = tempObjectDateKey[key];
+        console.log('dailyMealsArray', dailyMealsArray);
+        var dailyStat = createDailyStatObjectFromMealsArray(intakeData, dailyMealsArray, key);
+        statObject.statArray.push(dailyStat);
+    }
+    return statObject;
+};
+// api/stats/get_all
+exports.statsRouter.get('/get_all', function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
+    var user, mealsArray, statObject;
     return __generator(this, function (_a) {
-        return [2 /*return*/, res.status(200).send()];
+        switch (_a.label) {
+            case 0:
+                user = req.body.user;
+                return [4 /*yield*/, models_1.Meal.find({ owner: user._id }).select('_id name weight price energyValue dateString')];
+            case 1:
+                mealsArray = _a.sent();
+                statObject = createStatFromMealsArray(user.intakeData.energyValue, mealsArray);
+                return [2 /*return*/, res.status(201).json(statObject)];
+        }
     });
 }); });
-// api/stats/get_stat
-exports.statsRouter.post('/get_stat', function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
-    return __generator(this, function (_a) {
-        return [2 /*return*/, res.status(200).send()];
+// api/stats/get_stat_for_interval
+exports.statsRouter.post('/get_stat_for_interval', function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
+    var _a, user, interval, mealsArray, statObject;
+    return __generator(this, function (_b) {
+        switch (_b.label) {
+            case 0:
+                _a = req.body, user = _a.user, interval = _a.interval;
+                return [4 /*yield*/, models_1.Meal.find({
+                        owner: user._id,
+                        createdAt: { $gte: interval.from, $lte: interval.to }
+                    }).select('_id name weight price energyValue dateString')];
+            case 1:
+                mealsArray = _b.sent();
+                statObject = createStatFromMealsArray(user.intakeData.energyValue, mealsArray);
+                return [2 /*return*/, res.status(201).json(statObject)];
+        }
     });
 }); });
-// api/stats/update_stat
-exports.statsRouter.post('/update_stat', function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
-    return __generator(this, function (_a) {
-        return [2 /*return*/, res.status(200).send()];
+// api/stats/get_stat_for_day
+exports.statsRouter.post('/get_stat_for_day', function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
+    var _a, user, dateString, mealsArray, statObject;
+    return __generator(this, function (_b) {
+        switch (_b.label) {
+            case 0:
+                _a = req.body, user = _a.user, dateString = _a.dateString;
+                return [4 /*yield*/, models_1.Meal.find({ owner: user._id, dateString: dateString }).select('_id name weight price energyValue dateString')];
+            case 1:
+                mealsArray = _b.sent();
+                statObject = createStatFromMealsArray(user.intakeData.energyValue, mealsArray);
+                return [2 /*return*/, res.status(201).json(statObject)];
+        }
     });
 }); });

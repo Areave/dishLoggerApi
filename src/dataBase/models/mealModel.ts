@@ -16,6 +16,7 @@ const mealSchema = new Schema({
         require: true,
         ref: 'User'
     },
+    dateString: String,
     ingridients: [{
         ingridient: Object,
         weight: Number,
@@ -35,6 +36,6 @@ const mealSchema = new Schema({
         fats: Number,
         carbohydrates: Number
     }
-});
+}, {timestamps: true});
 
 export = model('Meal', mealSchema);

@@ -16,6 +16,7 @@ var mealSchema = new mongoose_1.Schema({
         require: true,
         ref: 'User'
     },
+    dateString: String,
     ingridients: [{
             ingridient: Object,
             weight: Number,
@@ -35,5 +36,5 @@ var mealSchema = new mongoose_1.Schema({
         fats: Number,
         carbohydrates: Number
     }
-});
+}, { timestamps: true });
 module.exports = (0, mongoose_1.model)('Meal', mealSchema);

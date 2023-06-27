@@ -6,30 +6,27 @@ const statSchema = new Schema({
         required: true,
         unique: true
     },
+    dateString: String,
     owner: {
         type: Types.ObjectId,
         require: true,
         ref: 'User'
     },
+    meals: Array,
+    weight: Number,
     price: Number,
-    ingridientsIds: {
-        products: [{
-            type: Types.ObjectId,
-            ref: 'Product'
-        }],
-        dishes: [{
-            type: Types.ObjectId,
-            ref: 'Dish'
-        }],
-    },
-    ingridientsAmount: {
-        products: Array,
-        dishes: Array,
-    },
-    ingridients: Array,
     energyValue: {
-        type: Object,
+        calories: Number,
+        proteines: Number,
+        fats: Number,
+        carbohydrates: Number
     },
+    energyValueDifference: {
+        calories: Number,
+        proteines: Number,
+        fats: Number,
+        carbohydrates: Number
+    }
 });
 
 export = model('Stat', statSchema);

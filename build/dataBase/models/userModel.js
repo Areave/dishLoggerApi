@@ -53,21 +53,29 @@ var userSchema = new mongoose_1.Schema({
         required: true,
     },
     intakeData: {
-        type: Object
+        energyValue: {
+            calories: Number,
+            proteines: Number,
+            fats: Number,
+            carbohydrates: Number
+        },
     },
-    dailyStats: {
-        type: Array
-    },
+    stats: [{
+            type: mongoose_1.Types.ObjectId,
+            ref: 'Stat'
+        }],
     products: [{
             type: mongoose_1.Types.ObjectId,
             ref: 'Product'
         }],
-    dishes: {
-        type: Array,
-    },
-    meals: {
-        type: Array,
-    },
+    dishes: [{
+            type: mongoose_1.Types.ObjectId,
+            ref: 'Dish'
+        }],
+    meals: [{
+            type: mongoose_1.Types.ObjectId,
+            ref: 'Meal'
+        }],
 }, { timestamps: true });
 userSchema.pre('save', function (next) {
     return __awaiter(this, void 0, void 0, function () {

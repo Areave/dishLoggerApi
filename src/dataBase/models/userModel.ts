@@ -14,21 +14,29 @@ const userSchema = new Schema({
         required: true,
     },
     intakeData: {
-        type: Object
+        energyValue: {
+            calories: Number,
+            proteines: Number,
+            fats: Number,
+            carbohydrates: Number
+        },
     },
-    dailyStats: {
-        type: Array
-    },
+    stats: [{
+        type: Types.ObjectId,
+        ref: 'Stat'
+    }],
     products: [{
         type: Types.ObjectId,
         ref: 'Product'
     }],
-    dishes: {
-        type: Array,
-    },
-    meals: {
-        type: Array,
-    },
+    dishes: [{
+        type: Types.ObjectId,
+        ref: 'Dish'
+    }],
+    meals: [{
+        type: Types.ObjectId,
+        ref: 'Meal'
+    }],
 }, {timestamps: true});
 
 userSchema.pre('save', async function (next){
