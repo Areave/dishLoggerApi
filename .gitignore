@@ -1,11 +1,5 @@
 /.idea/
 /.git/
-/www/
-/public/
-/build
+/build/
 /node_modules/
-
-client/
 .env
-src/mock/mockUsersDB.json
-src/mock/mockWordsDB.json
