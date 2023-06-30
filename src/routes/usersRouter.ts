@@ -8,10 +8,10 @@ import bcrypt from 'bcryptjs';
 
 dotenv.config();
 
-export const userRouter = Router({strict: true});
+export const usersRouter = Router({strict: true});
 
 // api/users/auth
-userRouter.post('/auth', [
+usersRouter.post('/auth', [
     check('login', 'Login can\'t be empty').notEmpty(),
     check('password', 'Password has to be at least 2 chars long').isLength({min: 2}),
 ], async (req: Request, res: Response) => {
@@ -31,16 +31,16 @@ userRouter.post('/auth', [
             });
         }
         const newUser = await User.create({login, name, password});
-        generateToken(res, newUser._id);
+        // generateToken(res, newUser._id);
         res.status(201).json({message: 'User created successfully', user: {login, name}});
     } catch (error) {
-        console.log('from userRouter', error.message);
+        console.log('from usersRouter', error.message);
         res.status(500).json({message: 'Database problems', stack: error.stackTrace})
     }
 });
 
 // api/users/login
-userRouter.post('/login', [
+usersRouter.post('/login', [
     check('login', 'Login can\'t be empty').notEmpty(),
     check('password', 'Password can\'t be empty').notEmpty(),
 ], async (req: Request, res: Response) => {
@@ -76,12 +76,18 @@ userRouter.post('/login', [
 });
 
 // api/users/logout
-userRouter.post('/logout', (req: Request, res: Response) => {
+usersRouter.post('/logout', (req: Request, res: Response) => {
+    console.log('logout route, req.cookies.jwt', req.cookies.jwt);
     if (req.cookies.jwt) {
         res.cookie('jwt', '', {
             httpOnly: true,
+            // secure: process.env.NODE_ENV !== 'development',
+            secure: true,
+            sameSite: 'none',
             // @ts-ignore
             expired: new Date(0),
+            // httpOnly: true,
+
         });
         res.status(200).json({message: 'Successfully logged out'});
     } else {
@@ -90,12 +96,12 @@ userRouter.post('/logout', (req: Request, res: Response) => {
 });
 
 // api/users/get
-userRouter.get('/get', verifyUser, (req: Request, res: Response) => {
+usersRouter.get('/get', verifyUser, (req: Request, res: Response) => {
     res.status(200).json(req.body.user);
 });
 
 // api/users/get_all
-userRouter.get('/get_all', async (req: Request, res: Response) => {
+usersRouter.get('/get_all', async (req: Request, res: Response) => {
     try {
         const users = await User.find().select('-password');
         res.status(200).json(users);
@@ -108,7 +114,7 @@ userRouter.get('/get_all', async (req: Request, res: Response) => {
 });
 
 // api/users/update
-userRouter.put('/update', verifyUser, async (req: Request, res: Response) => {
+usersRouter.put('/update', verifyUser, async (req: Request, res: Response) => {
     const {user, newUser} = req.body;
     try {
         if (newUser.password) {
@@ -135,7 +141,7 @@ userRouter.put('/update', verifyUser, async (req: Request, res: Response) => {
 });
 
 // api/users/delete_all
-userRouter.delete('/delete_all', async (req: Request, res: Response) => {
+usersRouter.delete('/delete_all', async (req: Request, res: Response) => {
     try {
         await User.deleteMany({});
         res.status(200).json({message: 'Users was deleted'});

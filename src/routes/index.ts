@@ -1,4 +1,4 @@
-import {userRouter} from "./userRouter";
+import {usersRouter} from "./usersRouter";
 import {dishesRouter} from "./dishesRouter";
 import {productRouter} from "./productRouter";
 import {mealsRouter} from "./mealsRouter";
@@ -6,7 +6,7 @@ import {statsRouter} from "./statsRouter";
 
 
 export {
-    userRouter,
+    usersRouter,
     dishesRouter,
     productRouter,
     mealsRouter,

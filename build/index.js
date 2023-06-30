@@ -42,7 +42,6 @@ Object.defineProperty(exports, "__esModule", { value: true });
 var express_1 = __importDefault(require("express"));
 var dotenv_1 = __importDefault(require("dotenv"));
 var cors_1 = __importDefault(require("cors"));
-// import './index.pug';
 var dbService_1 = require("./dataBase/dbService");
 var routes_1 = require("./routes");
 var cookie_parser_1 = __importDefault(require("cookie-parser"));
@@ -51,29 +50,18 @@ dotenv_1.default.config();
 var mongoUri = process.env.mongoUri;
 var port = process.env.PORT;
 var app = (0, express_1.default)();
-app.use((0, cookie_parser_1.default)());
 app.use(express_1.default.json());
-app.use((0, cors_1.default)());
+app.use((0, cors_1.default)({ credentials: true, origin: ['http://localhost:3000', 'http://127.0.0.1:3000'] }));
+app.use((0, cookie_parser_1.default)());
 app.use(express_1.default.urlencoded({ extended: true }));
-// app.use('/users', usersRouter);
-// app.use('/words', wordsRouter);
-app.use('/api/users', routes_1.userRouter);
+app.use('/api/users', routes_1.usersRouter);
 app.use('/api/products', authMiddleware_1.verifyUser, routes_1.productRouter);
 app.use('/api/dishes', authMiddleware_1.verifyUser, routes_1.dishesRouter);
 app.use('/api/meals', authMiddleware_1.verifyUser, routes_1.mealsRouter);
 app.use('/api/stats', authMiddleware_1.verifyUser, routes_1.statsRouter);
-// app.use('/api/auth/registration', (req, res) => {
-//     res.send('auth endpoint');
-// });
 app.get('/', function (req, res) {
     res.send('hey, its me');
 });
-// const compiledFunction = pug.compileFile('index.pug');
-// app.get('/', (request, response) => {
-//     response.send(pug.compileFile('./index.pug')({
-//         name: 'joe'
-//     }));
-// });
 var start = function () { return __awaiter(void 0, void 0, void 0, function () {
     var e_1;
     return __generator(this, function (_a) {

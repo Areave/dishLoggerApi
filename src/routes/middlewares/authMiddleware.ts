@@ -8,6 +8,10 @@ dotenv.config();
 
 export const verifyUser = asyncHandler(async (req, res, next) => {
 
+    if (req.method === "OPTIONS") {
+        return next();
+    }
+
     const rawToken = req.cookies.jwt;
     if (rawToken) {
         try {

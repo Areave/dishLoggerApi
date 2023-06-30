@@ -80,7 +80,7 @@ exports.userRouter.post('/auth', [
                 return [4 /*yield*/, models_1.User.create({ login: login, name: name_1, password: password })];
             case 3:
                 newUser = _b.sent();
-                (0, generateToken_1.default)(res, newUser._id);
+                // generateToken(res, newUser._id);
                 res.status(201).json({ message: 'User created successfully', user: { login: login, name: name_1 } });
                 return [3 /*break*/, 5];
             case 4:
@@ -146,9 +146,10 @@ exports.userRouter.post('/login', [
 }); });
 // api/users/logout
 exports.userRouter.post('/logout', function (req, res) {
+    console.log('logout route, req.cookies.jwt', req.cookies.jwt);
     if (req.cookies.jwt) {
         res.cookie('jwt', '', {
-            httpOnly: true,
+            // httpOnly: true,
             // @ts-ignore
             expired: new Date(0),
         });

@@ -73,6 +73,9 @@ exports.verifyUser = (0, express_async_handler_1.default)(function (req, res, ne
     return __generator(this, function (_a) {
         switch (_a.label) {
             case 0:
+                if (req.method === "OPTIONS") {
+                    return [2 /*return*/, next()];
+                }
                 rawToken = req.cookies.jwt;
                 if (!rawToken) return [3 /*break*/, 5];
                 _a.label = 1;
