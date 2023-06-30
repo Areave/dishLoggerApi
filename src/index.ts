@@ -5,6 +5,8 @@ import {dbConnect} from './dataBase/dbService';
 import {usersRouter, productRouter, dishesRouter, mealsRouter, statsRouter} from "./routes";
 import cookieParser from "cookie-parser";
 import {verifyUser} from "./routes/middlewares/authMiddleware";
+import swaggerUi from 'swagger-ui-express';
+import * as swaggerUiDocument from './utils/openApi.json'
 
 
 dotenv.config();
@@ -14,7 +16,7 @@ const port = process.env.PORT;
 const app = express();
 
 app.use(express.json());
-app.use(cors({credentials: true, origin: ['http://localhost:3000', 'http://127.0.0.1:3000']}));
+app.use(cors({credentials: true, origin: ['http://localhost:3000', 'http://127.0.0.1:3000', 'http://127.0.0.1:4000']}));
 app.use(cookieParser());
 
 app.use(express.urlencoded({extended: true}));
@@ -23,6 +25,7 @@ app.use('/api/products', verifyUser, productRouter);
 app.use('/api/dishes', verifyUser, dishesRouter);
 app.use('/api/meals', verifyUser, mealsRouter);
 app.use('/api/stats', verifyUser, statsRouter);
+app.use('/api/documentation', swaggerUi.serve, swaggerUi.setup(swaggerUiDocument));
 
 app.get('/', (req, res)=>{
     res.send('hey, its me');

@@ -6,6 +6,7 @@
     "outDir": "./build",
     "sourceMap": false,
     "forceConsistentCasingInFileNames": true,
+    "resolveJsonModule": true,
     "baseUrl": "."
   },
   "include": ["**/*"]

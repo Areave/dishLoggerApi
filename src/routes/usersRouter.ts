@@ -24,6 +24,12 @@ usersRouter.post('/auth', [
     }
     try {
         const {login, password, name} = req.body;
+        // if (login === 'joehill' && password === '1234' && name === 'Joe Hill') {
+        //     return res.status(201).json({message: 'User created successfully', user: {login, name}});
+        // }
+        // if (login === 'tomsawyer' && password === '1234' && name === 'Tom Sawyer') {
+        //     return res.status(400).json({message: 'User already exists'});
+        // }
         const user = await User.exists({login});
         if (user) {
             return res.status(400).json({
@@ -31,7 +37,7 @@ usersRouter.post('/auth', [
             });
         }
         const newUser = await User.create({login, name, password});
-        // generateToken(res, newUser._id);
+        generateToken(res, newUser._id);
         res.status(201).json({message: 'User created successfully', user: {login, name}});
     } catch (error) {
         console.log('from usersRouter', error.message);
@@ -77,7 +83,6 @@ usersRouter.post('/login', [
 
 // api/users/logout
 usersRouter.post('/logout', (req: Request, res: Response) => {
-    console.log('logout route, req.cookies.jwt', req.cookies.jwt);
     if (req.cookies.jwt) {
         res.cookie('jwt', '', {
             httpOnly: true,

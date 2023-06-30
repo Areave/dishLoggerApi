@@ -1,0 +1,252 @@
+{
+  "openapi": "3.0.1",
+  "info": {
+    "title": "dishLogger API",
+    "version": "v1",
+    "description": "Simple CRUD API application made with Express and documented with Swagger, and serve for counting everyday meal and energy values",
+    "license": {
+      "name": "MIT",
+      "url": "https://spdx.org/licenses/MIT.html"
+    },
+    "contact": {
+      "name": "Areave",
+      "url": "https://github.com/Areave",
+      "email": "work619@yandex.ru"
+    }
+  },
+  "servers": [
+    {
+      "url": "http://localhost:4000/api"
+    },
+    {
+      "url": "http://127.0.0.1:4000/api"
+    },
+    {
+      "url": "https://dish-logger.onrender.com/api"
+    }
+  ],
+  "tags": [
+    {
+      "name": "Users",
+      "description": "API"
+    },
+    {
+      "name": "Products",
+      "description": "API"
+    }
+  ],
+  "paths": {
+    "/users/auth": {
+      "post": {
+        "summary": "Authentication",
+        "tags": [
+          "Users"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UserAuthData"
+              },
+              "example": {
+                "login": "joehill",
+                "password": "1234",
+                "name": "Joe Hill"
+              }
+            }
+          }
+        },
+        "description": "Registration",
+        "responses": {
+          "201": {
+            "description": "User created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "message": {
+                    "type": "string"
+                  },
+                  "user": {
+                    "login": {
+                      "type": "string"
+                    },
+                    "name": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "example": {
+                  "message": "User created successfully",
+                  "user": {
+                    "login": "joehill",
+                    "name": "Joe Hill"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "User already exists",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "message": {
+                    "type": "string"
+                  }
+                },
+                "example": {
+                  "message": "User already exists"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Some database problems",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "message": {
+                    "type": "string"
+                  },
+                  "stack": {
+                    "type": "string"
+                  }
+                },
+                "example": {
+                  "message": "Database problems",
+                  "stack": "Database problems"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/users/login": {
+      "post": {
+        "summary": "Login",
+        "tags": [
+          "Users"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UserLoginData"
+              },
+              "example": {
+                "login": "joe",
+                "password": "1234"
+              }
+            }
+          }
+        },
+        "description": "Log in",
+        "responses": {
+          "204": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/products/product/{id}": {
+      "get": {
+        "summary": "get certain product by its mongoDB ID",
+        "tags": [
+          "Products"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "description": "product id",
+            "schema": {
+              "type": "string",
+              "example": "64990c180fe5d33b76d0cdb1"
+            }
+          }
+        ],
+        "description": "Get certain product",
+        "responses": {
+          "204": {
+            "description": "OK"
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "UserAuthData": {
+        "type": "object",
+        "properties": {
+          "login": {
+            "type": "string",
+            "required": true
+
+          },
+          "password": {
+            "type": "string",
+            "required": true
+          },
+          "name": {
+            "type": "string"
+          }
+        }
+      },
+      "UserLoginData": {
+        "type": "object",
+        "properties": {
+          "login": {
+            "type": "string",
+            "required": true
+          },
+          "password": {
+            "type": "string",
+            "required": true
+          }
+        }
+      },
+      "User": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "login": {
+            "type": "string"
+          },
+          "password": {
+            "type": "string"
+          },
+          "_id": {
+            "type": "string"
+          },
+          "intakeData": {
+            "energyValue": {
+              "calories": "number",
+              "proteines": "number",
+              "fats": "number",
+              "carbohydrates": "number"
+            }
+          },
+          "stats": [{
+            "type": "string"
+          }],
+          "products": [{
+            "type": "string"
+          }],
+          "dishes": [{
+            "type": "string"
+          }],
+          "meals": [{
+            "type": "string"
+          }]
+        }
+      }
+    }
+  }
+}
