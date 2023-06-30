@@ -2,6 +2,7 @@
 /.git/
 /www/
 /public/
+/build
 /node_modules/
 
 client/
