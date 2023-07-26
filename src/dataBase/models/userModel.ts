@@ -21,10 +21,10 @@ const userSchema = new Schema({
             carbohydrates: Number
         },
     },
-    role: [{
-        type: Types.ObjectId,
+    role: {
+        type: String,
         required: true,
-    }],
+    },
     products: [{
         type: Types.ObjectId,
         ref: 'Product'
