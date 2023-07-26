@@ -64,7 +64,7 @@ usersRouter.post('/login', [
     }
     try {
         const {login, password} = req.body;
-        const user = await User.findOne({login});
+        const user = await User.findOne({login}).populate('meals');
 
         // @ts-ignore
         if (!user || !(await user.matchPassword(password))) {
@@ -72,7 +72,10 @@ usersRouter.post('/login', [
         }
         generateToken(res, user._id);
         user.password = '';
-        res.status(200).json({message: 'You successfully logged in', user});
+        res.status(200).json({message: {
+                type: "success",
+                text: 'You successfully logged in',
+            }, user});
     } catch (error) {
         res.status(500).json({
             message: 'Database error',

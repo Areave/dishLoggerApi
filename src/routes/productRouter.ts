@@ -1,32 +1,9 @@
 import {Router, Request, Response} from 'express';
-import {User, Product} from './../dataBase/models';
-import {ObjectId} from "mongodb";
+import {Product} from './../dataBase/models';
+import updateUsersItems from "../utils/updateUsersItems";
+import generateObjectId from "../utils/generateObjectId";
 
 export const productRouter = Router({strict: true});
-
-const createObjectId = (id: string) => {
-    let objectId;
-    try {
-        objectId = new ObjectId(id);
-    } catch (error) {
-        throw new Error();
-    }
-    return objectId;
-};
-
-const updateUserProducts = async (res, userId, products) => {
-    try {
-        // const user = await User.findOne({id: userId}).populate('products').exec();
-        const updatedProducts = await Promise.all([User.updateOne({_id: userId}, {products}),
-                                Product.find({owner: userId}).select('-owner')]);
-        return res.status(201).json(updatedProducts[1]);
-    } catch (error) {
-        return res.status(500).json({
-            message: "Database problems",
-            stack: error.stackTrace
-        });
-    }
-};
 
 // api/products/get_all
 productRouter.get('/get_all', async (req: Request, res: Response): Promise<Response> => {
@@ -40,7 +17,7 @@ productRouter.get('/product/:id', async (req: Request, res: Response): Promise<R
     const {user} = req.body;
     let objectId;
     try {
-        objectId = createObjectId(req.params.id);
+        objectId = generateObjectId(req.params.id);
     } catch (error) {
         return res.status(400).json({
             message: 'Bad ID link',
@@ -71,7 +48,7 @@ productRouter.post('/add', async (req: Request, res: Response): Promise<Response
     product.owner = user._id;
     const newProduct = await Product.create({...product});
     const products = [...user.products, newProduct._id];
-    return await updateUserProducts(res, user._id, products);
+    return await updateUsersItems(res, user._id, {products}, Product);
 });
 
 // api/products/update
@@ -88,7 +65,7 @@ productRouter.delete('/remove', async (req: Request, res: Response): Promise<Res
     const {user, productId} = req.body;
     let objectId;
     try {
-        objectId = createObjectId(productId);
+        objectId = generateObjectId(productId);
     } catch (error) {
         return res.status(400).json({
             message: 'Bad ID link',
@@ -99,7 +76,7 @@ productRouter.delete('/remove', async (req: Request, res: Response): Promise<Res
     const products = user.products.filter(product => {
         return product._id != productId;
     });
-    return await updateUserProducts(res, user._id, products);
+    return await updateUsersItems(res, user._id, {products}, Product);
 });
 
 // api/products/remove_all
@@ -107,5 +84,5 @@ productRouter.delete('/remove_all', async (req: Request, res: Response): Promise
     const {user} = req.body;
     await Product.deleteMany({owner: user._id});
     const products = [];
-    return await updateUserProducts(res, user._id, products);
+    return await updateUsersItems(res, user._id, {products}, Product);
 });

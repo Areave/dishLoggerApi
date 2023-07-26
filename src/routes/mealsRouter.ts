@@ -1,5 +1,5 @@
 import {Router, Request, Response} from 'express';
-import {User, Meal} from './../dataBase/models';
+import {Meal} from './../dataBase/models';
 import generateObjectId from "../utils/generateObjectId";
 import updateUsersItems from "../utils/updateUsersItems";
 
@@ -17,7 +17,8 @@ mealsRouter.post('/add', async (req: Request, res: Response): Promise<Response> 
     const date = new Date();
     meal.dateString = `${date.getDate()}.${date.getMonth()+1}.${date.getFullYear()}`;
     const newItem = await Meal.create({...meal});
-    return await updateUsersItems(res, user._id, [...user.dishes, newItem._id], Meal);
+    const meals = [...user.meals, newItem._id];
+    return await updateUsersItems(res, user._id, {meals}, Meal);
 });
 
 // api/meals/meal/:id
@@ -63,7 +64,7 @@ mealsRouter.delete('/remove', async (req: Request, res: Response): Promise<Respo
     const meals = user.meals.filter(meal => {
         return meal._id != mealId;
     });
-    return await updateUsersItems(res, user._id, meals, Meal);
+    return await updateUsersItems(res, user._id, {meals}, Meal);
 });
 
 // api/meals/remove_all
@@ -71,5 +72,5 @@ mealsRouter.delete('/remove_all', async (req: Request, res: Response): Promise<R
     const {user} = req.body;
     await Meal.deleteMany({owner: user._id});
     const meals = [];
-    return await updateUsersItems(res, user._id, meals, Meal);
+    return await updateUsersItems(res, user._id, {meals}, Meal);
 });

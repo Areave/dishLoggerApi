@@ -121,7 +121,6 @@ const createStatFromMealsArray = (intakeData, mealsArray) => {
         const currentMeal = mealsArray[key];
         //fill mainStat
         statObject.mainStat = mergeMealDataToMainStat(currentMeal, statObject.mainStat);
-
         const dateStringKey = currentMeal.dateString;
         if (!tempObjectDateKey[dateStringKey]) {
             tempObjectDateKey[dateStringKey] = [currentMeal];
@@ -129,8 +128,6 @@ const createStatFromMealsArray = (intakeData, mealsArray) => {
             tempObjectDateKey[dateStringKey].push(currentMeal);
         }
     }
-
-    console.log('tempObjectDateKey', tempObjectDateKey);
     for (let key in tempObjectDateKey) {
         const dailyMealsArray = tempObjectDateKey[key];
         console.log('dailyMealsArray', dailyMealsArray);
