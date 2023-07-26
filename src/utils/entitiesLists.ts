@@ -9,8 +9,3 @@ export enum messageTypes {
     ERROR = 'error',
     SUCCESS = 'success',
 }
-
-// export default {
-//     roles,
-//     foodEntitiesList
-// };

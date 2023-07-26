@@ -5,7 +5,7 @@ const generateObjectId = (id: string) => {
     try {
         objectId = new ObjectId(id);
     } catch (error) {
-        throw new Error();
+        throw new Error(error.message);
     }
     return objectId;
 };
