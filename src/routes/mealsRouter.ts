@@ -1,7 +1,8 @@
 import {Router, Request, Response} from 'express';
 import {Meal} from './../dataBase/models';
-import generateObjectId from "../utils/generateObjectId";
 import updateUsersItems from "../utils/updateUsersItems";
+import {handleDataBaseError} from "../utils/handleDataBaseError";
+import {ObjectId} from "bson";
 
 export const mealsRouter = Router({strict: true});
 
@@ -26,12 +27,9 @@ mealsRouter.get('/meal/:id', async (req: Request, res: Response): Promise<Respon
     const {user} = req.body;
     let objectId;
     try {
-        objectId = generateObjectId(req.params.id);
+        objectId = new ObjectId(req.params.id);
     } catch (error) {
-        return res.status(400).json({
-            message: 'Bad ID link',
-            stack: error.stackTrace
-        });
+        return handleDataBaseError(error, 400, res);
     }
     let meal = await Meal.findOne({owner: user._id, _id: objectId}).select('-owner');
     if (!meal) {

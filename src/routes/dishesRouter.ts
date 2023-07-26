@@ -1,7 +1,8 @@
 import {Router, Request, Response} from 'express';
 import {Dish} from './../dataBase/models';
-import generateObjectId from "../utils/generateObjectId";
 import updateUsersItems from "../utils/updateUsersItems";
+import {handleDataBaseError} from "../utils/handleDataBaseError";
+import {ObjectId} from "bson";
 
 export const dishesRouter = Router({strict: true});
 
@@ -27,26 +28,24 @@ dishesRouter.get('/dish/:id', async (req: Request, res: Response): Promise<Respo
     const {user} = req.body;
     let objectId;
     try {
-        objectId = generateObjectId(req.params.id);
+        objectId = new ObjectId(req.params.id);
     } catch (error) {
-        return res.status(400).json({
-            message: {
-                type: 'error',
-                text: "Bad ID link"
-            },
-            stack: error.stackTrace
-        });
+        return handleDataBaseError(error, 400, res);
     }
-    let dish = await Dish.findOne({owner: user._id, _id: objectId}).select('-owner');
-    if (!dish) {
-        return res.status(400).json({
-            message: {
-                type: "error",
-                text: "No such dish"
-            }
-        });
+    try {
+        let dish = await Dish.findOne({owner: user._id, _id: objectId}).select('-owner');
+        if (!dish) {
+            return res.status(400).json({
+                message: {
+                    type: "error",
+                    text: "No such dish"
+                }
+            });
+        }
+        res.status(201).json(dish);
+    } catch (error) {
+        return handleDataBaseError(error, 500, res);
     }
-    res.status(201).json(dish);
 });
 
 // api/dishes/get_all

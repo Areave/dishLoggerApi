@@ -1,8 +1,9 @@
 import {Router, Request, Response} from 'express';
 import {Product} from './../dataBase/models';
 import updateUsersItems from "../utils/updateUsersItems";
-import generateObjectId from "../utils/generateObjectId";
-import {authorUser} from "./middlewares/autorUserMiddleware";
+import {messageTypes} from "../utils/entitiesLists";
+import {handleDataBaseError} from "../utils/handleDataBaseError";
+import {ObjectId} from "bson";
 
 export const productRouter = Router({strict: true});
 
@@ -18,20 +19,24 @@ productRouter.get('/product/:id', async (req: Request, res: Response): Promise<R
     const {user} = req.body;
     let objectId;
     try {
-        objectId = generateObjectId(req.params.id);
+        objectId = new ObjectId(req.params.id);
     } catch (error) {
-        return res.status(400).json({
-            message: 'Bad ID link',
-            stack: error.stackTrace
-        });
+        return handleDataBaseError(error, 400, res);
     }
-    const product = await Product.findOne({owner: user._id, _id: objectId});
-    if (!product) {
-        return res.status(400).json({
-            message: "No such product"
-        });
+    try {
+        const product = await Product.findOne({owner: user._id, _id: objectId});
+        if (!product) {
+            return res.status(400).json({
+                message: {
+                    type: messageTypes.ERROR,
+                    text: 'No such product'
+                }
+            });
+        }
+        res.status(201).json(product);
+    } catch (error) {
+        return handleDataBaseError(error, 500, res);
     }
-    res.status(201).json(product);
 });
 
 // api/products/add
@@ -64,16 +69,7 @@ productRouter.put('/update', async (req: Request, res: Response): Promise<Respon
 // api/products/remove
 productRouter.delete('/remove', async (req: Request, res: Response): Promise<Response> => {
     const {user, productId} = req.body;
-    let objectId;
-    try {
-        objectId = generateObjectId(productId);
-    } catch (error) {
-        return res.status(400).json({
-            message: 'Bad ID link',
-            stack: error.stackTrace
-        });
-    }
-    await Product.deleteOne({_id: objectId});
+    await Product.deleteOne({_id: productId});
     const products = user.products.filter(product => {
         return product._id != productId;
     });

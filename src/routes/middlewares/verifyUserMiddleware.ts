@@ -3,6 +3,7 @@ import dotenv from 'dotenv';
 import asyncHandler from 'express-async-handler';
 import {User} from '../../dataBase/models'
 import {messageTypes} from "../../utils/entitiesLists";
+import {handleDataBaseError} from "../../utils/handleDataBaseError";
 
 dotenv.config();
 
@@ -24,7 +25,6 @@ export const verifyUser = asyncHandler(async (req, res, next) => {
             const decoded = jwt.verify(rawToken, process.env.jwtKey);
             const user = await User.findById(decoded.userId).select('-password').populate('meals');
             if (!user) {
-                console.log('middleware error');
                 res.status(401).json({
                     message: {
                         type: messageTypes.ERROR,
@@ -34,19 +34,12 @@ export const verifyUser = asyncHandler(async (req, res, next) => {
             } else {
                 const newData = req.body;
                 req.body = {user, newData};
-                next();
+                return next();
             }
         } catch (error) {
-            console.log('middleware error');
-            res.status(401).json({
-                message: {
-                    type: messageTypes.ERROR,
-                    text: 'Not authorized'
-                }, stack: error.message
-            });
+            handleDataBaseError(error, 401, res);
         }
     } else {
-        console.log('middleware error');
         res.status(401).json({
             message: {
                 type: messageTypes.ERROR,

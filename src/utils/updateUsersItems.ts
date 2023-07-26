@@ -1,4 +1,5 @@
 import {User} from "../dataBase/models";
+import {handleDataBaseError} from "./handleDataBaseError";
 
 const updateUsersItems = async (res, userId, items, Model) => {
     try {
@@ -8,10 +9,7 @@ const updateUsersItems = async (res, userId, items, Model) => {
         ]);
         return res.status(201).json(promiseAllArray[1]);
     } catch (error) {
-        return res.status(500).json({
-            message: "Database problems",
-            stack: error.message
-        });
+        handleDataBaseError(error, 500, res)
     }
 };
 

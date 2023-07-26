@@ -76,7 +76,6 @@ const createDailyStatObjectFromMealsArray = (intakeData, dailyMealsArray: Meal[]
         }
     };
 
-    console.log('dailyMealsArray', dailyMealsArray);
     for (let i = 0; i < dailyMealsArray.length; i++) {
         const {_id, weight, price, name, energyValue} = dailyMealsArray[i];
 

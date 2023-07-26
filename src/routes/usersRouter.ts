@@ -7,6 +7,7 @@ import {verifyUser} from "./middlewares/verifyUserMiddleware";
 import bcrypt from 'bcryptjs';
 import {messageTypes} from "../utils/entitiesLists";
 import {authorUser} from "./middlewares/autorUserMiddleware";
+import {handleDataBaseError} from "../utils/handleDataBaseError";
 
 dotenv.config();
 
@@ -45,13 +46,7 @@ usersRouter.post('/auth', [
                 text: 'User created successfully'
             }, user: {login, name}});
     } catch (error) {
-        console.log('from usersRouter', error.message);
-        res.status(500).json({
-            message: {
-                type: messageTypes.ERROR,
-                text: 'Database problems'
-            }, stack: error.message
-        })
+        return handleDataBaseError(error, 500, res);
     }
 });
 
@@ -142,13 +137,7 @@ usersRouter.get('/get_all', verifyUser, authorUser, async (req: Request, res: Re
         const users = await User.find();
         res.status(200).json(users);
     } catch (error) {
-        res.status(500).json({
-            message: {
-                type: messageTypes.ERROR,
-                text: 'Database problems'
-            },
-            stack: error.message
-        });
+        return handleDataBaseError(error, 500, res);
     }
 });
 
@@ -160,13 +149,7 @@ usersRouter.put('/update', verifyUser, async (req: Request, res: Response) => {
             // TODO: тут юзер может ввести пароль короче минимума, нужно проверять
             newData.password = await bcrypt.hash(newData.password, await bcrypt.genSalt(10))
         } catch (error) {
-            res.status(500).json({
-                message: {
-                    type: messageTypes.ERROR,
-                    text: 'Database problems'
-                },
-                stack: error.message
-            });
+            return handleDataBaseError(error, 500, res);
         }
     }
     try {
@@ -193,13 +176,7 @@ usersRouter.put('/update', verifyUser, async (req: Request, res: Response) => {
             user: updatedUser
         });
     } catch (error) {
-        res.status(500).json({
-            message: {
-                type: messageTypes.ERROR,
-                text: 'Database problems'
-            },
-            stack: error.message
-        });
+        return handleDataBaseError(error, 500, res);
     }
 });
 
@@ -212,12 +189,6 @@ usersRouter.delete('/delete_all', verifyUser, authorUser, async (req: Request, r
                 text: 'Users was deleted'
             }});
     } catch (error) {
-        res.status(500).json({
-            message: {
-                type: messageTypes.ERROR,
-                text: 'Database problems'
-            },
-            stack: error.message
-        });
+        return handleDataBaseError(error, 500, res);
     }
 });
