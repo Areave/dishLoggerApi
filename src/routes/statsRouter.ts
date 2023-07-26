@@ -1,5 +1,6 @@
 import {Router, Request, Response} from 'express';
 import {Meal} from './../dataBase/models';
+import {handleDataBaseError} from "../utils/handleDataBaseError";
 
 export const statsRouter = Router({strict: true});
 
@@ -139,27 +140,40 @@ const createStatFromMealsArray = (intakeData, mealsArray) => {
 // api/stats/get_all
 statsRouter.get('/get_all', async (req: Request, res: Response): Promise<Response> => {
     const {user} = req.body;
-    let mealsArray = await Meal.find({owner: user._id}).select('_id name weight price energyValue dateString');
-    const statObject = createStatFromMealsArray(user.intakeData.energyValue, mealsArray);
-    return res.status(201).json(statObject);
+    try {
+        let mealsArray = await Meal.find({owner: user._id}).select('_id name weight price energyValue dateString');
+        const statObject = createStatFromMealsArray(user.intakeData.energyValue, mealsArray);
+        return res.status(201).json(statObject);
+    } catch(error) {
+        return handleDataBaseError(error, 500, res);
+    }
+
 });
 
 // api/stats/get_stat_for_interval
 statsRouter.post('/get_stat_for_interval', async (req: Request, res: Response): Promise<Response> => {
     const {user, interval} = req.body;
-    let mealsArray = await Meal.find({
-        owner: user._id,
-        createdAt: {$gte: interval.from, $lte: interval.to}
-    }).select('_id name weight price energyValue dateString');
-    const statObject = createStatFromMealsArray(user.intakeData.energyValue, mealsArray);
-    return res.status(201).json(statObject);
+    try {
+        let mealsArray = await Meal.find({
+            owner: user._id,
+            createdAt: {$gte: interval.from, $lte: interval.to}
+        }).select('_id name weight price energyValue dateString');
+        const statObject = createStatFromMealsArray(user.intakeData.energyValue, mealsArray);
+        return res.status(201).json(statObject);
+    } catch (error) {
+        return handleDataBaseError(error, 500, res);
+    }
 });
 
 // api/stats/get_stat_for_day
 statsRouter.post('/get_stat_for_day', async (req: Request, res: Response): Promise<Response> => {
     const {user, dateString} = req.body;
-    let mealsArray = await Meal.find({owner: user._id, dateString: dateString}).select('_id name weight price energyValue dateString');
-    const statObject = createStatFromMealsArray(user.intakeData.energyValue, mealsArray);
-    return res.status(201).json(statObject);
+    try {
+        let mealsArray = await Meal.find({owner: user._id, dateString: dateString}).select('_id name weight price energyValue dateString');
+        const statObject = createStatFromMealsArray(user.intakeData.energyValue, mealsArray);
+        return res.status(201).json(statObject);
+    } catch (error) {
+        return handleDataBaseError(error, 500, res);
+    }
 });
 
