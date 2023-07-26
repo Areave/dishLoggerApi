@@ -21,9 +21,9 @@ const userSchema = new Schema({
             carbohydrates: Number
         },
     },
-    stats: [{
+    role: [{
         type: Types.ObjectId,
-        ref: 'Stat'
+        required: true,
     }],
     products: [{
         type: Types.ObjectId,
