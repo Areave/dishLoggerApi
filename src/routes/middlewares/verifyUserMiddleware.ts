@@ -22,7 +22,7 @@ export const verifyUser = asyncHandler(async (req, res, next) => {
     if (rawToken) {
         try {
             const decoded = jwt.verify(rawToken, process.env.jwtKey);
-            const user = await User.findById(decoded.userId).select('-password -role').populate('meals');
+            const user = await User.findById(decoded.userId).select('-password').populate('meals');
             if (!user) {
                 console.log('middleware error');
                 res.status(401).json({

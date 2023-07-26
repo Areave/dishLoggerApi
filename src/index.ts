@@ -4,7 +4,7 @@ import cors from 'cors';
 import {dbConnect} from './dataBase/dbService';
 import {usersRouter, productRouter, dishesRouter, mealsRouter, statsRouter} from "./routes";
 import cookieParser from "cookie-parser";
-import {verifyUser} from "./routes/middlewares/authMiddleware";
+import {verifyUser} from "./routes/middlewares/verifyUserMiddleware";
 import swaggerUi from 'swagger-ui-express';
 import * as swaggerUiDocument from './utils/openApi.json';
 

@@ -3,9 +3,10 @@ import {User} from './../dataBase/models'
 import dotenv from 'dotenv'
 import {check, validationResult} from 'express-validator';
 import generateToken from "../utils/generateToken";
-import {verifyUser} from "./middlewares/authMiddleware";
+import {verifyUser} from "./middlewares/verifyUserMiddleware";
 import bcrypt from 'bcryptjs';
 import {messageTypes} from "../utils/entitiesLists";
+import {authorUser} from "./middlewares/autorUserMiddleware";
 
 dotenv.config();
 
@@ -136,7 +137,7 @@ usersRouter.get('/get', verifyUser, (req: Request, res: Response) => {
 });
 
 // api/users/get_all
-usersRouter.get('/get_all', async (req: Request, res: Response) => {
+usersRouter.get('/get_all', verifyUser, authorUser, async (req: Request, res: Response) => {
     try {
         const users = await User.find();
         res.status(200).json(users);
@@ -203,7 +204,7 @@ usersRouter.put('/update', verifyUser, async (req: Request, res: Response) => {
 });
 
 // api/users/delete_all
-usersRouter.delete('/delete_all', async (req: Request, res: Response) => {
+usersRouter.delete('/delete_all', verifyUser, authorUser, async (req: Request, res: Response) => {
     try {
         await User.deleteMany({});
         res.status(200).json({message: {

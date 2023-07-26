@@ -2,6 +2,7 @@ import {Router, Request, Response} from 'express';
 import {Product} from './../dataBase/models';
 import updateUsersItems from "../utils/updateUsersItems";
 import generateObjectId from "../utils/generateObjectId";
+import {authorUser} from "./middlewares/autorUserMiddleware";
 
 export const productRouter = Router({strict: true});
 
