@@ -20,6 +20,7 @@ const mealSchema = new Schema({
     ingridients: [{
         ingridient: Object,
         weight: Number,
+        amountOfItems: Number,
         price: Number,
         energyValue: {
             calories: Number,

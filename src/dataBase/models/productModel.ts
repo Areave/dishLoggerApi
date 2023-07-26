@@ -16,14 +16,24 @@ const productSchema = new Schema({
         require: true,
         ref: 'User'
     },
-    weightOfPieceGr: {
+    amountOfItems: {
+        type: Number,
+    },
+    weightTotal: {
         type: Number,
     },
     price: {
-        priceForPiece: Number,
+        priceForOnePiece: Number,
+        priceTotal: Number,
         priceFor100g: Number
     },
     energyValueFor100g: {
+        calories: Number,
+        proteines: Number,
+        fats: Number,
+        carbohydrates: Number
+    },
+    energyValueForOneItem: {
         calories: Number,
         proteines: Number,
         fats: Number,
