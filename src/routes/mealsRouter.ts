@@ -3,23 +3,35 @@ import {Meal} from './../dataBase/models';
 import updateUsersItems from "../utils/updateUsersItems";
 import {handleDataBaseError} from "../utils/handleDataBaseError";
 import {ObjectId} from "bson";
+import {types} from "util";
+import {messageTypes} from "../utils/entitiesLists";
 
 export const mealsRouter = Router({strict: true});
 
 // api/meals/add
 mealsRouter.post('/add', async (req: Request, res: Response): Promise<Response> => {
     const {user, meal} = req.body;
-    if (await Meal.exists({name: meal.name, owner: user._id})) {
-        return res.status(400).json({
-            message: "Duplicate name: " + meal.name
-        });
+    try {
+        const candidate = await Meal.exists({name: meal.name, owner: user._id})
+        if (candidate) {
+            return res.status(400).json({
+                type: messageTypes.ERROR,
+                text: "Duplicate name: " + meal.name
+            });
+        }
+    } catch (error) {
+        return handleDataBaseError(error, 500, res);
     }
     meal.owner = user._id;
     const date = new Date();
     meal.dateString = `${date.getDate()}.${date.getMonth()+1}.${date.getFullYear()}`;
-    const newItem = await Meal.create({...meal});
-    const meals = [...user.meals, newItem._id];
-    return await updateUsersItems(res, user._id, {meals}, Meal);
+    try {
+        const newItem = await Meal.create({...meal});
+        const meals = [...user.meals, newItem._id];
+        return await updateUsersItems(res, user._id, {meals}, Meal);
+    } catch (error) {
+        return handleDataBaseError(error, 500, res);
+    }
 });
 
 // api/meals/meal/:id
@@ -31,44 +43,65 @@ mealsRouter.get('/meal/:id', async (req: Request, res: Response): Promise<Respon
     } catch (error) {
         return handleDataBaseError(error, 400, res);
     }
-    let meal = await Meal.findOne({owner: user._id, _id: objectId}).select('-owner');
-    if (!meal) {
-        return res.status(400).json({
-            message: "No such meal"
-        });
+    try {
+        let meal = await Meal.findOne({owner: user._id, _id: objectId}).select('-owner');
+        if (!meal) {
+            return res.status(400).json({
+                type: messageTypes.ERROR,
+                text: "No such meal"
+            });
+        }
+        res.status(201).json(meal);
+    } catch (error) {
+        return handleDataBaseError(error, 500, res);
     }
-    res.status(201).json(meal);
 });
 
 // api/meals/get_all
 mealsRouter.get('/get_all', async (req: Request, res: Response): Promise<Response> => {
     const {user} = req.body;
-    const userDishes = await Meal.find({owner: user._id}).select('-owner');
-    return res.status(200).json(userDishes);
+    try {
+        const userDishes = await Meal.find({owner: user._id}).select('-owner');
+        return res.status(200).json(userDishes);
+    } catch (error) {
+        return handleDataBaseError(error, 500, res);
+    }
 });
 
 // api/meals/update
 mealsRouter.put('/update', async (req: Request, res: Response): Promise<Response> => {
     const {user, meal} = req.body;
     await Meal.updateOne({_id: meal._id}, {...meal});
-    const dishes = await Meal.find({owner: user._id}).select('-owner');
-    return res.status(201).json(dishes);
+    try {
+        const dishes = await Meal.find({owner: user._id}).select('-owner');
+        return res.status(201).json(dishes);
+    } catch (error) {
+        return handleDataBaseError(error, 500, res);
+    }
 });
 
 // api/meals/remove
-mealsRouter.delete('/remove', async (req: Request, res: Response): Promise<Response> => {
-    const {user, mealId} = req.body;
-    await Meal.deleteOne({_id: mealId});
-    const meals = user.meals.filter(meal => {
-        return meal._id != mealId;
-    });
-    return await updateUsersItems(res, user._id, {meals}, Meal);
+mealsRouter.delete('/remove/:id', async (req: Request, res: Response): Promise<Response> => {
+    const {user} = req.body;
+    try {
+        await Meal.deleteOne({_id: req.params.id});
+        const meals = user.meals.filter(meal => {
+            return meal._id != req.params.id;
+        });
+        return await updateUsersItems(res, user._id, {meals}, Meal);
+    } catch (error) {
+        return handleDataBaseError(error, 500, res);
+    }
 });
 
 // api/meals/remove_all
 mealsRouter.delete('/remove_all', async (req: Request, res: Response): Promise<Response> => {
     const {user} = req.body;
-    await Meal.deleteMany({owner: user._id});
+    try {
+        await Meal.deleteMany({owner: user._id});
+    } catch (error) {
+        return handleDataBaseError(error, 500, res);
+    }
     const meals = [];
     return await updateUsersItems(res, user._id, {meals}, Meal);
 });

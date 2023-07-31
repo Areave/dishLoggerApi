@@ -10,8 +10,13 @@ export const productRouter = Router({strict: true});
 // api/products/get_all
 productRouter.get('/get_all', async (req: Request, res: Response): Promise<Response> => {
     const {user} = req.body;
-    const userProducts = await Product.find({owner: user._id});
-    return res.status(200).json(userProducts);
+    try {
+        const userProducts = await Product.find({owner: user._id});
+        return res.status(200).json(userProducts);
+    } catch (error) {
+        return handleDataBaseError(error, 500, res);
+    }
+
 });
 
 // api/products/product/:id
@@ -43,14 +48,22 @@ productRouter.get('/product/:id', async (req: Request, res: Response): Promise<R
 productRouter.post('/add', async (req: Request, res: Response): Promise<Response> => {
     const {user, product} = req.body;
     if (!product) {
-        res.status(400).json({message: "Product is null"})
+        res.status(400).json({
+            type: messageTypes.ERROR,
+            text: "Product is null"})
     }
-    const candidate = await Product.findOne({name: product.name, owner: user._id});
-    if (candidate) {
-        return res.status(400).json({
-            message: "Duplicate name: " + product.name
-        });
+    try {
+        const candidate = await Product.findOne({name: product.name, owner: user._id});
+        if (candidate) {
+            return res.status(400).json({
+                type: messageTypes.ERROR,
+                text: "Duplicate name: " + product.name
+            });
+        }
+    } catch (error) {
+        return handleDataBaseError(error, 500, res);
     }
+
     product.owner = user._id;
     const newProduct = await Product.create({...product});
     const products = [...user.products, newProduct._id];
@@ -61,25 +74,38 @@ productRouter.post('/add', async (req: Request, res: Response): Promise<Response
 productRouter.put('/update', async (req: Request, res: Response): Promise<Response> => {
     const {user, product} = req.body;
     product.owner = user._id;
-    await Product.updateOne({_id: product._id}, {...product});
-    const products = await Product.find({owner: user._id}).select('-owner');
-    return res.status(201).json(products);
+    try {
+        await Product.updateOne({_id: product._id}, {...product});
+        const products = await Product.find({owner: user._id}).select('-owner');
+        return res.status(201).json(products);
+    } catch (error) {
+        return handleDataBaseError(error, 500, res);
+    }
 });
 
 // api/products/remove
-productRouter.delete('/remove', async (req: Request, res: Response): Promise<Response> => {
-    const {user, productId} = req.body;
-    await Product.deleteOne({_id: productId});
-    const products = user.products.filter(product => {
-        return product._id != productId;
-    });
-    return await updateUsersItems(res, user._id, {products}, Product);
+productRouter.delete('/remove/:id', async (req: Request, res: Response): Promise<Response> => {
+    const {user} = req.body;
+    try {
+        await Product.deleteOne({_id: req.params.id});
+        const products = user.products.filter(product => {
+            return product._id != req.params.id;
+        });
+        return await updateUsersItems(res, user._id, {products}, Product);
+    } catch (error) {
+        return handleDataBaseError(error, 500, res);
+    }
+
 });
 
 // api/products/remove_all
 productRouter.delete('/remove_all', async (req: Request, res: Response): Promise<Response> => {
     const {user} = req.body;
-    await Product.deleteMany({owner: user._id});
+    try {
+        await Product.deleteMany({owner: user._id});
+    } catch (error) {
+        return handleDataBaseError(error, 500, res);
+    }
     const products = [];
     return await updateUsersItems(res, user._id, {products}, Product);
 });

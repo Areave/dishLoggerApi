@@ -90,7 +90,7 @@ const createDailyStatObjectFromMealsArray = (intakeData, dailyMealsArray: Meal[]
         dailyStatObject.energyValue.fats += energyValue.fats;
         dailyStatObject.energyValue.carbohydrates += energyValue.carbohydrates;
     }
-    console.log('dailyStatObject', dailyStatObject);
+    // console.log('dailyStatObject', dailyStatObject);
     dailyStatObject.energyValueDifference = getStatDifferences(intakeData, dailyStatObject.energyValue);
     return dailyStatObject;
 };
@@ -130,7 +130,7 @@ const createStatFromMealsArray = (intakeData, mealsArray) => {
     }
     for (let key in tempObjectDateKey) {
         const dailyMealsArray = tempObjectDateKey[key];
-        console.log('dailyMealsArray', dailyMealsArray);
+        // console.log('dailyMealsArray', dailyMealsArray);
         const dailyStat = createDailyStatObjectFromMealsArray(intakeData, dailyMealsArray, key);
         statObject.statArray.push(dailyStat);
     }
@@ -168,6 +168,7 @@ statsRouter.post('/get_stat_for_interval', async (req: Request, res: Response): 
 // api/stats/get_stat_for_day
 statsRouter.post('/get_stat_for_day', async (req: Request, res: Response): Promise<Response> => {
     const {user, dateString} = req.body;
+    // console.log('req.body', req.body);
     try {
         let mealsArray = await Meal.find({owner: user._id, dateString: dateString}).select('_id name weight price energyValue dateString');
         const statObject = createStatFromMealsArray(user.intakeData.energyValue, mealsArray);

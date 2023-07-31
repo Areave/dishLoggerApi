@@ -10,6 +10,7 @@
     "build": "tsc",
     "start": "node .",
     "dev": "tsc && node .",
+    "dev_for_postman": "tsc && node . true",
     "server:dev": "concurrently \"tsc -w --preserveWatchOutput\" \"nodemon build/index.js\""
   },
   "keywords": [],

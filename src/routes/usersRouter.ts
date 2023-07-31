@@ -1,5 +1,5 @@
 import {Router, Request, Response} from 'express';
-import {User} from './../dataBase/models'
+import {Meal, User} from './../dataBase/models'
 import dotenv from 'dotenv'
 import {check, validationResult} from 'express-validator';
 import generateToken from "../utils/generateToken";
@@ -33,10 +33,8 @@ usersRouter.post('/auth', [
         const user = await User.exists({login});
         if (user) {
             return res.status(400).json({
-                message: {
                     type: messageTypes.ERROR,
                     text: 'User already exists'
-                }
             });
         }
         const newUser = await User.create({login, name, password, role});
@@ -66,23 +64,20 @@ usersRouter.post('/login', [
     const loginErrors = validationResult(req);
     if (!loginErrors.isEmpty()) {
         return res.status(400).json({
-            message: {
                 type: messageTypes.ERROR,
                 text: 'Login or password is wrong',
-                errors: loginErrors.array(),
-            }
+                errors: loginErrors.array()
         });
     }
     try {
         const {login, password} = req.body;
-        const user = await User.findOne({login}).populate('meals').select('-role');
-
+        const user = await User.findOne({login}).populate('products dishes meals').select('-role');
         // @ts-ignore
         if (!user || !(await user.matchPassword(password))) {
-            return res.status(400).json({message: {
+            return res.status(400).json({
                     type: messageTypes.ERROR,
                     text: 'Login or password is wrong'
-                }});
+                });
         }
         generateToken(res, user._id);
         user.password = '';
@@ -93,12 +88,7 @@ usersRouter.post('/login', [
             }, user
         });
     } catch (error) {
-        res.status(500).json({
-            message: {
-                type: messageTypes.ERROR,
-                text: 'Database problems'
-            }, stack: error.message
-        });
+        return handleDataBaseError(error, 500, res);
     }
 });
 
@@ -128,7 +118,7 @@ usersRouter.post('/logout', (req: Request, res: Response) => {
 
 // api/users/get
 usersRouter.get('/get', verifyUser, (req: Request, res: Response) => {
-    res.status(200).json(req.body.user);
+    res.status(200).json(req.body);
 });
 
 // api/users/get_all
@@ -143,21 +133,21 @@ usersRouter.get('/get_all', verifyUser, authorUser, async (req: Request, res: Re
 
 // api/users/update
 usersRouter.put('/update', verifyUser, async (req: Request, res: Response) => {
-    const {user, newData} = req.body;
-    if (newData.password) {
+    const {user, newUser} = req.body;
+    if (newUser.password) {
         try {
             // TODO: тут юзер может ввести пароль короче минимума, нужно проверять
-            newData.password = await bcrypt.hash(newData.password, await bcrypt.genSalt(10))
+            newUser.password = await bcrypt.hash(newUser.password, await bcrypt.genSalt(10))
         } catch (error) {
             return handleDataBaseError(error, 500, res);
         }
     }
     try {
         // TODO: небезопасно, пользователь может через подмену кода поменять любые поля
-        const updatedUser = await User.findOneAndUpdate({_id: user._id}, newData, {
+        const updatedUser = await User.findOneAndUpdate({_id: user._id}, newUser, {
             new: true
         }).select('-password -role');
-        if (newData.password || newData.login) {
+        if (newUser.password || newUser.login) {
             res.cookie('jwt', '', {
                 httpOnly: true,
                 // @ts-ignore

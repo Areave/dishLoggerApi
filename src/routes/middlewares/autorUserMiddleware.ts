@@ -11,10 +11,9 @@ export const authorUser = asyncHandler(async (req, res, next) => {
 
     if (role !== roles.ADMIN) {
         res.status(401).json({
-            message: {
                 type: messageTypes.ERROR,
                 text: 'No access to data'
-            }});
+            });
     } else {
         return next()
     }

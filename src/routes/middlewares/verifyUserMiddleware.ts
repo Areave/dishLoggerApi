@@ -1,7 +1,7 @@
 import * as jwt from 'jsonwebtoken'
 import dotenv from 'dotenv';
 import asyncHandler from 'express-async-handler';
-import {User} from '../../dataBase/models'
+import {Meal, User} from '../../dataBase/models'
 import {messageTypes} from "../../utils/entitiesLists";
 import {handleDataBaseError} from "../../utils/handleDataBaseError";
 
@@ -23,17 +23,15 @@ export const verifyUser = asyncHandler(async (req, res, next) => {
     if (rawToken) {
         try {
             const decoded = jwt.verify(rawToken, process.env.jwtKey);
-            const user = await User.findById(decoded.userId).select('-password').populate('meals');
+            const user = await User.findById(decoded.userId).select('-password').populate('products dishes meals');
+            // const user = await User.findById(decoded.userId).select('-password').populate('products dishes meals');
             if (!user) {
                 res.status(401).json({
-                    message: {
                         type: messageTypes.ERROR,
                         text: 'No such user'
-                    }
                 });
             } else {
-                const newData = req.body;
-                req.body = {user, newData};
+                req.body.user = user;
                 return next();
             }
         } catch (error) {
@@ -41,9 +39,8 @@ export const verifyUser = asyncHandler(async (req, res, next) => {
         }
     } else {
         res.status(401).json({
-            message: {
                 type: messageTypes.ERROR,
                 text: 'Not authorized'
-        }});
+        });
     }
 });
