@@ -5,6 +5,7 @@ import {handleDataBaseError} from "../utils/handleDataBaseError";
 import {ObjectId} from "bson";
 import {types} from "util";
 import {messageTypes} from "../utils/entitiesLists";
+import {getDateStringFromRawDate} from "../utils/dateConverter";
 
 export const mealsRouter = Router({strict: true});
 
@@ -24,7 +25,7 @@ mealsRouter.post('/add', async (req: Request, res: Response): Promise<Response> 
     }
     meal.owner = user._id;
     const date = new Date();
-    meal.dateString = `${date.getDate()}.${date.getMonth()+1}.${date.getFullYear()}`;
+    meal.dateString = getDateStringFromRawDate(date);
     try {
         const newItem = await Meal.create({...meal});
         const meals = [...user.meals, newItem._id];

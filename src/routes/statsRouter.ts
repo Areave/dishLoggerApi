@@ -1,6 +1,7 @@
 import {Router, Request, Response} from 'express';
 import {Meal} from './../dataBase/models';
 import {handleDataBaseError} from "../utils/handleDataBaseError";
+import {getDateStringFromJSONStringDate} from "../utils/dateConverter";
 
 export const statsRouter = Router({strict: true});
 
@@ -167,8 +168,10 @@ statsRouter.post('/get_stat_for_interval', async (req: Request, res: Response): 
 
 // api/stats/get_stat_for_day
 statsRouter.post('/get_stat_for_day', async (req: Request, res: Response): Promise<Response> => {
-    const {user, dateString} = req.body;
+    const {user, date} = req.body;
     // console.log('req.body', req.body);
+    const dateString = getDateStringFromJSONStringDate(date);
+    console.log('dateString', dateString);
     try {
         let mealsArray = await Meal.find({owner: user._id, dateString: dateString}).select('_id name weight price energyValue dateString');
         const statObject = createStatFromMealsArray(user.intakeData.energyValue, mealsArray);
