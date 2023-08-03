@@ -82,7 +82,7 @@ dishesRouter.put('/update', async (req: Request, res: Response): Promise<Respons
 });
 
 // api/dishes/remove
-dishesRouter.delete('/remove', async (req: Request, res: Response): Promise<Response> => {
+dishesRouter.delete('/remove/:id', async (req: Request, res: Response): Promise<Response> => {
     const {user} = req.body;
     try {
         await Dish.deleteOne({_id: req.params.id});
