@@ -19,7 +19,7 @@ const userSchema = new Schema({
             proteines: Number,
             fats: Number,
             carbohydrates: Number
-        },
+        } || {},
     },
     role: {
         type: String,

@@ -21,6 +21,10 @@ interface Meal {
 
 const getStatDifferences = (intakeData, stat) => {
 
+    if (!intakeData || !intakeData.energyValue || Object.keys(intakeData.energyValue).length === 0) {
+        return {};
+    }
+
     const energyValueDifference = {
         calories: 0,
         proteines: 0,
@@ -28,12 +32,12 @@ const getStatDifferences = (intakeData, stat) => {
         carbohydrates: 0
     };
 
-    if (!intakeData) {
-        return energyValueDifference;
-    }
-
     for (let key in energyValueDifference) {
-        energyValueDifference[key] = stat[key] - intakeData[key];
+        console.log('key', key)
+        if (stat[key] && intakeData.energyValue[key]) {
+            energyValueDifference[key] = ((stat[key] / intakeData.energyValue[key]) * 100).toFixed(0);
+        }
+
     }
     return energyValueDifference;
 };
@@ -70,12 +74,7 @@ const createDailyStatObjectFromMealsArray = (intakeData, dailyMealsArray: Meal[]
             fats: 0,
             carbohydrates: 0
         },
-        energyValueDifference: {
-            calories: 0,
-            proteines: 0,
-            fats: 0,
-            carbohydrates: 0
-        }
+        energyValueDifference: {}
     };
 
     for (let i = 0; i < dailyMealsArray.length; i++) {
@@ -143,7 +142,7 @@ statsRouter.get('/get_all', async (req: Request, res: Response): Promise<Respons
     const {user} = req.body;
     try {
         let mealsArray = await Meal.find({owner: user._id}).select('_id name weight price energyValue dateString');
-        const statObject = createStatFromMealsArray(user.intakeData.energyValue, mealsArray);
+        const statObject = createStatFromMealsArray(user.intakeData, mealsArray);
         return res.status(201).json(statObject);
     } catch(error) {
         return handleDataBaseError(error, 500, res);
@@ -159,7 +158,7 @@ statsRouter.post('/get_stat_for_interval', async (req: Request, res: Response): 
             owner: user._id,
             createdAt: {$gte: interval.from, $lte: interval.to}
         }).select('_id name weight price energyValue dateString');
-        const statObject = createStatFromMealsArray(user.intakeData.energyValue, mealsArray);
+        const statObject = createStatFromMealsArray(user.intakeData, mealsArray);
         return res.status(201).json(statObject);
     } catch (error) {
         return handleDataBaseError(error, 500, res);
@@ -169,12 +168,10 @@ statsRouter.post('/get_stat_for_interval', async (req: Request, res: Response): 
 // api/stats/get_stat_for_day
 statsRouter.post('/get_stat_for_day', async (req: Request, res: Response): Promise<Response> => {
     const {user, date} = req.body;
-    // console.log('req.body', req.body);
     const dateString = getDateStringFromJSONStringDate(date);
-    console.log('dateString', dateString);
     try {
         let mealsArray = await Meal.find({owner: user._id, dateString: dateString}).select('_id name weight price energyValue dateString');
-        const statObject = createStatFromMealsArray(user.intakeData.energyValue, mealsArray);
+        const statObject = createStatFromMealsArray(user.intakeData, mealsArray);
         return res.status(201).json(statObject);
     } catch (error) {
         return handleDataBaseError(error, 500, res);
