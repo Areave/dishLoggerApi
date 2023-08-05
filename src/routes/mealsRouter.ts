@@ -6,6 +6,7 @@ import {ObjectId} from "bson";
 import {types} from "util";
 import {messageTypes} from "../utils/entitiesLists";
 import {getDateStringFromRawDate} from "../utils/dateConverter";
+import {rebaseIngridients} from "../utils/rebaseIngridients";
 
 export const mealsRouter = Router({strict: true});
 
@@ -45,14 +46,18 @@ mealsRouter.get('/meal/:id', async (req: Request, res: Response): Promise<Respon
         return handleDataBaseError(error, 400, res);
     }
     try {
-        let meal = await Meal.findOne({owner: user._id, _id: objectId}).select('-owner');
+        let meal = await Meal.findOne({owner: user._id, _id: objectId}).select('-owner').populate('ingridientsIds');
         if (!meal) {
             return res.status(400).json({
                 type: messageTypes.ERROR,
                 text: "No such meal"
             });
         }
-        res.status(201).json(meal);
+        const mealWithIngridients = rebaseIngridients([meal])[0];
+        // console.log('meal before rebase ingridients', meal);
+        // meal = (rebaseIngridients([meal]))[0];
+        // console.log('meal after rebase ingridients', meal);
+        res.status(201).json(mealWithIngridients);
     } catch (error) {
         return handleDataBaseError(error, 500, res);
     }
@@ -62,8 +67,8 @@ mealsRouter.get('/meal/:id', async (req: Request, res: Response): Promise<Respon
 mealsRouter.get('/get_all', async (req: Request, res: Response): Promise<Response> => {
     const {user} = req.body;
     try {
-        const userDishes = await Meal.find({owner: user._id}).select('-owner');
-        return res.status(200).json(userDishes);
+        const userMeals = await Meal.find({owner: user._id}).select('-owner');
+        return res.status(200).json(userMeals);
     } catch (error) {
         return handleDataBaseError(error, 500, res);
     }
@@ -74,8 +79,8 @@ mealsRouter.put('/update', async (req: Request, res: Response): Promise<Response
     const {user, meal} = req.body;
     await Meal.updateOne({_id: meal._id}, {...meal});
     try {
-        const dishes = await Meal.find({owner: user._id}).select('-owner');
-        return res.status(201).json(dishes);
+        const meals = await Meal.find({owner: user._id}).select('-owner');
+        return res.status(201).json(meals);
     } catch (error) {
         return handleDataBaseError(error, 500, res);
     }

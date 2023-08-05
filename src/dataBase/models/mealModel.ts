@@ -17,8 +17,12 @@ const mealSchema = new Schema({
         ref: 'User'
     },
     dateString: String,
-    ingridients: [{
-        ingridient: Object,
+    ingridientsIds: [{
+        type: Types.ObjectId,
+        require: true,
+        ref: 'Product' || 'Dish'
+    }],
+    ingridientsAmount: [{
         weight: Number,
         amountOfItems: Number,
         price: Number,

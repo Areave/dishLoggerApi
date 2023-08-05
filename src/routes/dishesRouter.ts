@@ -4,6 +4,7 @@ import updateUsersItems from "../utils/updateUsersItems";
 import {handleDataBaseError} from "../utils/handleDataBaseError";
 import {ObjectId} from "bson";
 import {messageTypes} from "../utils/entitiesLists";
+import {rebaseIngridients} from "../utils/rebaseIngridients";
 
 export const dishesRouter = Router({strict: true});
 
@@ -43,7 +44,7 @@ dishesRouter.get('/dish/:id', async (req: Request, res: Response): Promise<Respo
         return handleDataBaseError(error, 400, res);
     }
     try {
-        let dish = await Dish.findOne({owner: user._id, _id: objectId}).select('-owner');
+        let dish = await Dish.findOne({owner: user._id, _id: objectId}).select('-owner').populate('ingridientsIds');
         if (!dish) {
             return res.status(400).json({
                 message: {
@@ -52,7 +53,8 @@ dishesRouter.get('/dish/:id', async (req: Request, res: Response): Promise<Respo
                 }
             });
         }
-        res.status(201).json(dish);
+        const dishWithIngridients = rebaseIngridients([dish])[0];
+        res.status(201).json(dishWithIngridients);
     } catch (error) {
         return handleDataBaseError(error, 500, res);
     }

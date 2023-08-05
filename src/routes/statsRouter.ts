@@ -33,7 +33,7 @@ const getStatDifferences = (intakeData, stat) => {
     };
 
     for (let key in energyValueDifference) {
-        console.log('key', key)
+        // console.log('key', key)
         if (stat[key] && intakeData.energyValue[key]) {
             energyValueDifference[key] = ((stat[key] / intakeData.energyValue[key]) * 100).toFixed(0);
         }

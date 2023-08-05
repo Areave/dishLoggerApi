@@ -8,6 +8,7 @@ import bcrypt from 'bcryptjs';
 import {messageTypes} from "../utils/entitiesLists";
 import {authorUser} from "./middlewares/autorUserMiddleware";
 import {handleDataBaseError} from "../utils/handleDataBaseError";
+import {rebaseIngridients} from "../utils/rebaseIngridients";
 
 dotenv.config();
 
@@ -71,7 +72,7 @@ usersRouter.post('/login', [
     }
     try {
         const {login, password} = req.body;
-        const user = await User.findOne({login}).populate('products dishes meals').select('-role');
+        const user = await User.findOne({login}).select('-role').populate('products dishes meals');
         // @ts-ignore
         if (!user || !(await user.matchPassword(password))) {
             return res.status(400).json({
@@ -81,6 +82,7 @@ usersRouter.post('/login', [
         }
         generateToken(res, user._id);
         user.password = '';
+        user.meals = (rebaseIngridients(user.meals));
         res.status(200).json({
             message: {
                 type: messageTypes.SUCCESS,
