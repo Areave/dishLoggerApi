@@ -67,7 +67,8 @@ mealsRouter.get('/meal/:id', async (req: Request, res: Response): Promise<Respon
 mealsRouter.get('/get_all', async (req: Request, res: Response): Promise<Response> => {
     const {user} = req.body;
     try {
-        const userMeals = await Meal.find({owner: user._id}).select('-owner');
+        const userMeals = await Meal.find({owner: user._id}).select('-owner').populate('ingridients.ingridient');
+
         return res.status(200).json(userMeals);
     } catch (error) {
         return handleDataBaseError(error, 500, res);

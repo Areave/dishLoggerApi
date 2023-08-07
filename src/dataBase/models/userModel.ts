@@ -25,18 +25,18 @@ const userSchema = new Schema({
         type: String,
         required: true,
     },
-    products: [{
-        type: Types.ObjectId,
-        ref: 'Product'
-    }],
-    dishes: [{
-        type: Types.ObjectId,
-        ref: 'Dish'
-    }],
-    meals: [{
-        type: Types.ObjectId,
-        ref: 'Meal'
-    }],
+    // products: [{
+    //     type: Types.ObjectId,
+    //     ref: 'Product'
+    // }],
+    // dishes: [{
+    //     type: Types.ObjectId,
+    //     ref: 'Dish'
+    // }],
+    // meals: [{
+    //     type: Types.ObjectId,
+    //     ref: 'Meal'
+    // }],
 }, {timestamps: true});
 
 userSchema.pre('save', async function (next){

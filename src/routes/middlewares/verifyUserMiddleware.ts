@@ -24,28 +24,58 @@ export const verifyUser = asyncHandler(async (req, res, next) => {
     if (rawToken) {
         try {
             const decoded = jwt.verify(rawToken, process.env.jwtKey);
-            let docks;
-            const user = await User.findById(decoded.userId).select('-password -products -dishes').populate('meals')
-                .populate({
-                path: 'meals',
-                populate: {
-                    path: 'ingridientsIds',
-                    options: {
-                        retainNullValues: true
-                    },
-                    model: 'Product' || 'Dish'
-                }
-            })
-                // .exec((error, docs) => console.log('error', error, 'docs', docs));
+
+            const user = await User.findById(decoded.userId).select('-password')
+                // .populate('meals')
+                // .populate({
+                //     path: 'meals.$',
+                //     populate: {
+                //         path: 'ingridients._id',
+                //         populate: {
+                //             path: 'ingridient'
+                //         }
+                //     }
+                // })
+                // .populate({
+                //     path: 'meals.$',
+                //     populate: {
+                //         path: 'ingridients.$',
+                //         populate: 'ingridient'
+                //     }
+                // })
+            // .populate({
+            //         path: 'meals.ingridients.$',
+            //         populate: 'ingridient'
+            //     }
+            // )
+
+            // @ts-ignore
+            // console.log('ingr: ',
+            //     user.meals &&
+            //     // @ts-ignore
+            //     user.meals[0].ingridients &&
+            //     // @ts-ignore
+            //     user.meals[0].ingridients[0] &&
+            //     // @ts-ignore
+            //     user.meals[0].ingridients[0].ingridient);
+
+            // if (user.meals[0]) {
+            //     // @ts-ignore
+            //     user.meals[0].ingridientsIds.forEach((idObject, index) => console.log(index, idObject));
+            // }
+
+            // @ts-ignore
+
+            // .exec((error, docs) => console.log('error', error, 'docs', docs));
             // const user = await User.findById(decoded.userId).select('-password').populate('products dishes meals');
             if (!user) {
                 res.status(401).json({
-                        type: messageTypes.ERROR,
-                        text: 'No such user'
+                    type: messageTypes.ERROR,
+                    text: 'No such user'
                 });
             } else {
                 // console.log('user.meals before rebase ingridients', user.meals);
-                user.meals = (rebaseIngridients(user.meals));
+                // user.meals = (rebaseIngridients(user.meals));
                 // console.log('user.meals after rebase ingridients', user.meals);
                 req.body.user = user;
                 return next();
@@ -55,8 +85,8 @@ export const verifyUser = asyncHandler(async (req, res, next) => {
         }
     } else {
         res.status(401).json({
-                type: messageTypes.ERROR,
-                text: 'Not authorized'
+            type: messageTypes.ERROR,
+            text: 'Not authorized'
         });
     }
 });

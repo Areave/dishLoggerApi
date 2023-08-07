@@ -82,7 +82,7 @@ usersRouter.post('/login', [
         }
         generateToken(res, user._id);
         user.password = '';
-        user.meals = (rebaseIngridients(user.meals));
+        // user.meals = (rebaseIngridients(user.meals));
         res.status(200).json({
             message: {
                 type: messageTypes.SUCCESS,
