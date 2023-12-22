@@ -72,7 +72,8 @@ usersRouter.post('/login', [
     }
     try {
         const {login, password} = req.body;
-        const user = await User.findOne({login}).select('-role').populate('products dishes meals');
+        const user = await User.findOne({login}).select('-role');
+        // const user = await User.findOne({login}).select('-role').populate('products dishes meals');
         // @ts-ignore
         if (!user || !(await user.matchPassword(password))) {
             return res.status(400).json({

@@ -6,9 +6,9 @@ export enum roles {
     USER = 'user',
 }
 export enum itemsTypes {
-    PRODUCT = 'product',
-    DISH = 'dish',
-    MEAL = 'meal',
+    PRODUCT = 'PRODUCT',
+    DISH = 'DISH',
+    MEAL = 'MEAL',
 }
 export enum messageTypes {
     ERROR = 'error',

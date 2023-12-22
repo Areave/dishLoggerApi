@@ -1,14 +1,6 @@
 import {Schema, model, Types} from 'mongoose';
-import {itemsTypes} from "../../utils/entitiesLists";
 
-
-const returnModelByType = (doc) => {
-    const parentType = doc.type;
-    switch (parentType) {
-        case itemsTypes.PRODUCT: return 'Product';
-        case itemsTypes.DISH: return 'Dish';
-    }
-};
+import {returnModelByType} from "../../utils/returnModelByType";
 
 const mealSchema = new Schema({
     name: {
@@ -32,7 +24,6 @@ const mealSchema = new Schema({
             ingridient: {
                 type: Types.ObjectId,
                 require: true,
-                // ref: 'Dish'
                 ref: returnModelByType
             },
             type: {
@@ -40,7 +31,7 @@ const mealSchema = new Schema({
                 required: true
             },
             weight: Number,
-            amountOfItems: Number,
+            amount: Number,
             price: Number,
             energyValue: {
                 calories: Number,

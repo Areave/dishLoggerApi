@@ -27,8 +27,8 @@ dishesRouter.post('/add', async (req: Request, res: Response): Promise<Response>
     dish.owner = user._id;
     try {
         const newItem = await Dish.create({...dish});
-        const dishes = [...user.dishes, newItem._id];
-        return await updateUsersItems(res, user._id, {dishes}, Dish);
+        // const dishes = [...user.dishes, newItem._id];
+        return await updateUsersItems(res, user._id, Dish);
     } catch (error) {
         return handleDataBaseError(error, 500, res);
     }
@@ -64,7 +64,7 @@ dishesRouter.get('/dish/:id', async (req: Request, res: Response): Promise<Respo
 dishesRouter.get('/get_all', async (req: Request, res: Response): Promise<Response> => {
     const {user} = req.body;
     try {
-        const userDishes = await Dish.find({owner: user._id}).select('-owner');
+        const userDishes = await Dish.find({owner: user._id}).select('-owner').populate('ingridients.ingridient');
         return res.status(200).json(userDishes);
     } catch (error) {
         return handleDataBaseError(error, 500, res);
@@ -88,10 +88,10 @@ dishesRouter.delete('/remove/:id', async (req: Request, res: Response): Promise<
     const {user} = req.body;
     try {
         await Dish.deleteOne({_id: req.params.id});
-        const dishes = user.dishes.filter(dish => {
-            return dish._id != req.params.id;
-        });
-        return await updateUsersItems(res, user._id, {dishes}, Dish);
+        // const dishes = user.dishes.filter(dish => {
+        //     return dish._id != req.params.id;
+        // });
+        return await updateUsersItems(res, user._id, Dish);
     } catch (error) {
         return handleDataBaseError(error, 500, res);
     }
@@ -106,5 +106,5 @@ dishesRouter.delete('/remove_all', async (req: Request, res: Response): Promise<
         return handleDataBaseError(error, 500, res);
     }
     const dishes = [];
-    return await updateUsersItems(res, user._id, {dishes}, Dish);
+    return await updateUsersItems(res, user._id, Dish);
 });

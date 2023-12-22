@@ -78,6 +78,12 @@ export const verifyUser = asyncHandler(async (req, res, next) => {
                 // user.meals = (rebaseIngridients(user.meals));
                 // console.log('user.meals after rebase ingridients', user.meals);
                 req.body.user = user;
+                // const reqData = {
+                //     data: req.body,
+                //     user
+                // };
+                // // console.log(reqData);
+                // req.body = reqData;
                 return next();
             }
         } catch (error) {

@@ -16,6 +16,7 @@ const productSchema = new Schema({
         require: true,
         ref: 'User'
     },
+    cookingCoefficient: Number,
     weight: Number,
     price: Number,
     energyValue: {
@@ -24,10 +25,11 @@ const productSchema = new Schema({
         fats: Number,
         carbohydrates: Number
     },
-    isThatPieceProduct: Boolean,
-    amountOfPieces: Number,
-    priceForAllPieces: Number,
-    energyValueForOnePiece: {
+    isThatPieceItem: Boolean,
+    amount: Number,
+    priceForAllItems: Number,
+    weightForAllItems: Number,
+    energyValueForOneItem: {
         calories: Number,
         proteines: Number,
         fats: Number,

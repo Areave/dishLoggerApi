@@ -29,8 +29,8 @@ mealsRouter.post('/add', async (req: Request, res: Response): Promise<Response> 
     meal.dateString = getDateStringFromRawDate(date);
     try {
         const newItem = await Meal.create({...meal});
-        const meals = [...user.meals, newItem._id];
-        return await updateUsersItems(res, user._id, {meals}, Meal);
+        // const meals = [...user.meals, newItem._id];
+        return await updateUsersItems(res, user._id, Meal);
     } catch (error) {
         return handleDataBaseError(error, 500, res);
     }
@@ -68,7 +68,6 @@ mealsRouter.get('/get_all', async (req: Request, res: Response): Promise<Respons
     const {user} = req.body;
     try {
         const userMeals = await Meal.find({owner: user._id}).select('-owner').populate('ingridients.ingridient');
-
         return res.status(200).json(userMeals);
     } catch (error) {
         return handleDataBaseError(error, 500, res);
@@ -92,10 +91,10 @@ mealsRouter.delete('/remove/:id', async (req: Request, res: Response): Promise<R
     const {user} = req.body;
     try {
         await Meal.deleteOne({_id: req.params.id});
-        const meals = user.meals.filter(meal => {
-            return meal._id != req.params.id;
-        });
-        return await updateUsersItems(res, user._id, {meals}, Meal);
+        // const meals = user.meals.filter(meal => {
+        //     return meal._id != req.params.id;
+        // });
+        return await updateUsersItems(res, user._id, Meal);
     } catch (error) {
         return handleDataBaseError(error, 500, res);
     }
@@ -110,5 +109,5 @@ mealsRouter.delete('/remove_all', async (req: Request, res: Response): Promise<R
         return handleDataBaseError(error, 500, res);
     }
     const meals = [];
-    return await updateUsersItems(res, user._id, {meals}, Meal);
+    return await updateUsersItems(res, user._id, Meal);
 });

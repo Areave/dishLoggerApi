@@ -1,5 +1,5 @@
 import {Schema, model, Types} from 'mongoose';
-import {Dish, Product} from "./index";
+import {returnModelByType} from "../../utils/returnModelByType";
 
 const dishSchema = new Schema({
     name: {
@@ -17,23 +17,24 @@ const dishSchema = new Schema({
         require: true,
         ref: 'User'
     },
-    ingridientsIds: [{
-        type: Types.ObjectId,
-        require: true,
-        ref: 'Product' || 'Dish'
-    }],
-    ingridientsAmount: [{
-        weight: Number,
-        amountOfItems: Number,
-        price: Number,
-        energyValue: {
-            calories: Number,
-            proteines: Number,
-            fats: Number,
-            carbohydrates: Number
+    ingridients: [
+        {
+            ingridient: {
+                type: Types.ObjectId,
+                require: true,
+                ref: returnModelByType
+            },
+            type: {
+                type: String,
+                required: true
+            },
+            weight: Number,
+            amount: Number,
         }
-    }],
+    ],
+    isThatPieceItem: Boolean,
     weight: Number,
+    amount: Number,
     price: Number,
     energyValue: {
         calories: Number,
