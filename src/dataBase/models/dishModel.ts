@@ -34,7 +34,6 @@ const dishSchema = new Schema({
     ],
     isThatPieceItem: Boolean,
     weight: Number,
-    amount: Number,
     price: Number,
     energyValue: {
         calories: Number,
