@@ -1,5 +1,5 @@
 import {Router, Request, Response} from 'express';
-import {Meal} from './../dataBase/models';
+import {Dish, Meal} from './../dataBase/models';
 import updateUsersItems from "../utils/updateUsersItems";
 import {handleDataBaseError} from "../utils/handleDataBaseError";
 import {ObjectId} from "bson";
@@ -25,12 +25,14 @@ mealsRouter.post('/add', async (req: Request, res: Response): Promise<Response> 
         return handleDataBaseError(error, 500, res);
     }
     meal.owner = user._id;
-    const date = new Date();
-    meal.dateString = getDateStringFromRawDate(date);
     try {
-        const newItem = await Meal.create({...meal});
-        // const meals = [...user.meals, newItem._id];
-        return await updateUsersItems(res, user._id, Meal);
+        meal.date = new Date();
+        // Слабое место, нужно продолжать после успешного создания
+        await Meal.create(meal);
+        const meals = await Meal.find({owner: user._id}).select('-owner').populate({
+            path:'ingridients.ingridient',
+        });
+        return res.status(201).json(meals);
     } catch (error) {
         return handleDataBaseError(error, 500, res);
     }
@@ -79,7 +81,7 @@ mealsRouter.put('/update', async (req: Request, res: Response): Promise<Response
     const {user, meal} = req.body;
     await Meal.updateOne({_id: meal._id}, {...meal});
     try {
-        const meals = await Meal.find({owner: user._id}).select('-owner');
+        const meals = await Meal.find({owner: user._id}).select('-owner').populate('ingridients.ingridient');
         return res.status(201).json(meals);
     } catch (error) {
         return handleDataBaseError(error, 500, res);

@@ -150,17 +150,18 @@ usersRouter.put('/update', verifyUser, async (req: Request, res: Response) => {
         const updatedUser = await User.findOneAndUpdate({_id: user._id}, newUser, {
             new: true
         }).select('-password -role');
-        if (newUser.password || newUser.login) {
-            res.cookie('jwt', '', {
-                httpOnly: true,
-                // @ts-ignore
-                expired: new Date(0),
-            });
-            return res.status(201).json({message: {
-                    type: messageTypes.SUCCESS,
-                    text: 'User data was updated, login again'
-                }});
-        }
+        // TODO: смена пароля или логина
+        // if (newUser.password || newUser.login) {
+        //     res.cookie('jwt', '', {
+        //         httpOnly: true,
+        //         // @ts-ignore
+        //         expired: new Date(0),
+        //     });
+        //     return res.status(201).json({message: {
+        //             type: messageTypes.SUCCESS,
+        //             text: 'User data was updated, login again'
+        //         }});
+        // }
         res.status(201).json({
             message: {
                 type: messageTypes.SUCCESS,

@@ -33,6 +33,7 @@ const mealSchema = new Schema({
             weight: Number,
             amount: Number,
             price: Number,
+            weightForTakenAmount: Number,
             energyValue: {
                 calories: Number,
                 proteines: Number,
@@ -43,12 +44,13 @@ const mealSchema = new Schema({
     ],
     weight: Number,
     price: Number,
+    priceUSD: Number,
     energyValue: {
         calories: Number,
         proteines: Number,
         fats: Number,
         carbohydrates: Number
-    }
+    },
 }, {timestamps: true});
 
 export = model('Meal', mealSchema);

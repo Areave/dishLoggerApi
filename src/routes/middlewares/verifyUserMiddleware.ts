@@ -6,6 +6,7 @@ import {messageTypes} from "../../utils/entitiesLists";
 import {rebaseIngridients} from "../../utils/rebaseIngridients";
 import {handleDataBaseError} from "../../utils/handleDataBaseError";
 
+
 dotenv.config();
 
 export const verifyUser = asyncHandler(async (req, res, next) => {
@@ -78,6 +79,7 @@ export const verifyUser = asyncHandler(async (req, res, next) => {
                 // user.meals = (rebaseIngridients(user.meals));
                 // console.log('user.meals after rebase ingridients', user.meals);
                 req.body.user = user;
+
                 // const reqData = {
                 //     data: req.body,
                 //     user

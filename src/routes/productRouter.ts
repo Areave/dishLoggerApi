@@ -10,7 +10,7 @@ export const productRouter = Router({strict: true});
 // api/products/get_all
 productRouter.get('/get_all', async (req: Request, res: Response): Promise<Response> => {
     const {user} = req.body;
-    console.log(user)
+    // console.log(user)
     try {
         const userProducts = await Product.find({owner: user._id}).select('-owner');
         return res.status(200).json(userProducts);
@@ -48,9 +48,9 @@ productRouter.get('/product/:id', async (req: Request, res: Response): Promise<R
 // api/products/add
 productRouter.post('/add', async (req: Request, res: Response): Promise<Response> => {
     const {user, product} = req.body;
-    console.log('req.body', req.body);
+    // console.log('req.body', req.body);
     if (!product) {
-        console.log('product', product);
+        // console.log('product', product);
         // res.status(400).json({
         //     type: messageTypes.ERROR,
         //     text: "Product is null"})

@@ -30,6 +30,14 @@ const dishSchema = new Schema({
             },
             weight: Number,
             amount: Number,
+            weightForTakenAmount: Number,
+            price: Number,
+            energyValue: {
+                calories: Number,
+                proteines: Number,
+                fats: Number,
+                carbohydrates: Number
+            }
         }
     ],
     isThatPieceItem: Boolean,
@@ -40,7 +48,8 @@ const dishSchema = new Schema({
         proteines: Number,
         fats: Number,
         carbohydrates: Number
-    }
-});
+    },
+    tags: [String]
+}, {timestamps: true});
 
 export = model('Dish', dishSchema);

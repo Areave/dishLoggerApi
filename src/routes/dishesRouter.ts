@@ -11,6 +11,8 @@ export const dishesRouter = Router({strict: true});
 // api/dishes/add
 dishesRouter.post('/add', async (req: Request, res: Response): Promise<Response> => {
     const {user, dish} = req.body;
+    // console.log('req.body', req.body);
+    // console.log('req', req);
     try {
         const candidate = await Dish.exists({name: dish.name, owner: user._id});
         if (candidate) {
@@ -26,9 +28,15 @@ dishesRouter.post('/add', async (req: Request, res: Response): Promise<Response>
     }
     dish.owner = user._id;
     try {
+        // Слабое место, нужно продолжать после успешного создания
         const newItem = await Dish.create({...dish});
         // const dishes = [...user.dishes, newItem._id];
-        return await updateUsersItems(res, user._id, Dish);
+        // return await updateUsersItems(res, user._id, Dish);
+        const dishes = await Dish.find({owner: user._id}).select('-owner').populate({
+                path:'ingridients.ingridient',
+                // match: { 'type': 'MEAL' || 'DISH',}
+            });
+        return res.status(201).json(dishes);
     } catch (error) {
         return handleDataBaseError(error, 500, res);
     }
@@ -76,7 +84,7 @@ dishesRouter.put('/update', async (req: Request, res: Response): Promise<Respons
     const {user, dish} = req.body;
     try {
         await Dish.updateOne({_id: dish._id}, {...dish});
-        const dishes = await Dish.find({owner: user._id}).select('-owner');
+        const dishes = await Dish.find({owner: user._id}).select('-owner').populate('ingridients.ingridient');
         return res.status(201).json(dishes);
     } catch (error) {
         return handleDataBaseError(error, 500, res);

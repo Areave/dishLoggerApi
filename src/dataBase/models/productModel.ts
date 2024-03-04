@@ -35,6 +35,7 @@ const productSchema = new Schema({
         fats: Number,
         carbohydrates: Number
     },
-});
+    tags: [String]
+}, {timestamps: true});
 
 export = model('Product', productSchema);

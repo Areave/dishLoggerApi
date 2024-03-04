@@ -14,12 +14,21 @@ const userSchema = new Schema({
         required: true,
     },
     intakeData: {
+        tags: {
+          products: [String],
+          dishes: [String]
+        },
         energyValue: {
             calories: Number,
             proteines: Number,
             fats: Number,
             carbohydrates: Number
         } || {},
+        currency: {
+            symbol: String,
+            name: String,
+            short_code: String,
+        }
     },
     role: {
         type: String,

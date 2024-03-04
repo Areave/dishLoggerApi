@@ -3,6 +3,7 @@ import {handleDataBaseError} from "./handleDataBaseError";
 import {rebaseIngridients} from "./rebaseIngridients";
 
 const updateUsersItems = async (res, userId, Model) => {
+    console.log(Model);
     try {
         const promiseAllArray = await Promise.all([
             // User.updateOne({_id: userId}, items),
