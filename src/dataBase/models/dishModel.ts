@@ -28,6 +28,7 @@ const dishSchema = new Schema({
                 type: String,
                 required: true
             },
+            weightTaken: Number,
             weight: Number,
             amount: Number,
             weightForTakenAmount: Number,

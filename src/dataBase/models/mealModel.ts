@@ -30,6 +30,7 @@ const mealSchema = new Schema({
                 type: String,
                 required: true
             },
+            weightTaken: Number,
             weight: Number,
             amount: Number,
             price: Number,
